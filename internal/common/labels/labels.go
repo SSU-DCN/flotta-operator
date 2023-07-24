@@ -9,7 +9,6 @@ const (
 	DoesNotExistLabel   = "doesnotexist"
 	WorkloadLabelPrefix = "workload/"
 	SelectorLabelPrefix = "selector/"
-	ConfigLabelPrefix   = "config/"
 )
 
 func WorkloadLabel(workloadName string) string {
@@ -26,8 +25,4 @@ func IsSelectorLabel(label string) bool {
 
 func CreateSelectorLabel(label string) string {
 	return SelectorLabelPrefix + label
-}
-
-func IsEdgeConfigLabel(label string) bool {
-	return strings.HasPrefix(label, ConfigLabelPrefix)
 }

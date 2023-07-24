@@ -127,21 +127,6 @@ func (mr *MockRepositoryFacadeMockRecorder) GetEdgeWorkload(arg0, arg1, arg2 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEdgeWorkload", reflect.TypeOf((*MockRepositoryFacade)(nil).GetEdgeWorkload), arg0, arg1, arg2)
 }
 
-// GetPlaybookExecution mocks base method.
-func (m *MockRepositoryFacade) GetPlaybookExecution(arg0 context.Context, arg1, arg2 string) (*v1alpha1.PlaybookExecution, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPlaybookExecution", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*v1alpha1.PlaybookExecution)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPlaybookExecution indicates an expected call of GetPlaybookExecution.
-func (mr *MockRepositoryFacadeMockRecorder) GetPlaybookExecution(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaybookExecution", reflect.TypeOf((*MockRepositoryFacade)(nil).GetPlaybookExecution), arg0, arg1, arg2)
-}
-
 // GetSecret mocks base method.
 func (m *MockRepositoryFacade) GetSecret(arg0 context.Context, arg1, arg2 string) (*v1.Secret, error) {
 	m.ctrl.T.Helper()
@@ -183,20 +168,6 @@ func (m *MockRepositoryFacade) PatchEdgeDeviceStatus(arg0 context.Context, arg1 
 func (mr *MockRepositoryFacadeMockRecorder) PatchEdgeDeviceStatus(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchEdgeDeviceStatus", reflect.TypeOf((*MockRepositoryFacade)(nil).PatchEdgeDeviceStatus), arg0, arg1, arg2)
-}
-
-// PatchPlaybookExecution mocks base method.
-func (m *MockRepositoryFacade) PatchPlaybookExecution(arg0 context.Context, arg1, arg2 *v1alpha1.PlaybookExecution) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PatchPlaybookExecution", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// PatchPlaybookExecution indicates an expected call of PatchPlaybookExecution.
-func (mr *MockRepositoryFacadeMockRecorder) PatchPlaybookExecution(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPlaybookExecution", reflect.TypeOf((*MockRepositoryFacade)(nil).PatchPlaybookExecution), arg0, arg1, arg2)
 }
 
 // UpdateEdgeDeviceLabels mocks base method.

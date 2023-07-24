@@ -11,7 +11,6 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedeviceset"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevicesignedrequest"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgeworkload"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/k8sclient"
 )
 
@@ -20,8 +19,6 @@ type EdgeDeviceRepository interface {
 	PatchEdgeDeviceStatus(ctx context.Context, edgeDevice *v1alpha1.EdgeDevice, patch *client.Patch) error
 	UpdateEdgeDeviceLabels(ctx context.Context, device *v1alpha1.EdgeDevice, labels map[string]string) error
 	PatchEdgeDevice(ctx context.Context, old, new *v1alpha1.EdgeDevice) error
-	GetPlaybookExecution(ctx context.Context, name string, namespace string) (*v1alpha1.PlaybookExecution, error)
-	PatchPlaybookExecution(ctx context.Context, old, new *v1alpha1.PlaybookExecution) error
 }
 
 type EdgeDeviceSignedRequestRepository interface {
@@ -37,11 +34,6 @@ type EdgeDeviceSetRepository interface {
 	GetEdgeDeviceSet(ctx context.Context, name string, namespace string) (*v1alpha1.EdgeDeviceSet, error)
 }
 
-type PlaybookExecutionRepository interface {
-	GetPlaybookExecution(ctx context.Context, name string, namespace string) (*v1alpha1.PlaybookExecution, error)
-	PatchPlaybookExecution(ctx context.Context, old, new *v1alpha1.PlaybookExecution) error
-}
-
 type CoreRepository interface {
 	GetSecret(ctx context.Context, name string, namespace string) (*v1.Secret, error)
 	GetConfigMap(ctx context.Context, name string, namespace string) (*v1.ConfigMap, error)
@@ -53,7 +45,6 @@ type RepositoryFacade interface {
 	EdgeDeviceSignedRequestRepository
 	EdgeWorkloadRepository
 	EdgeDeviceSetRepository
-	PlaybookExecutionRepository
 	CoreRepository
 }
 type repositoryFacade struct {
@@ -61,7 +52,6 @@ type repositoryFacade struct {
 	deviceRepository              edgedevice.Repository
 	workloadRepository            edgeworkload.Repository
 	deviceSetRepository           edgedeviceset.Repository
-	playbookExecutionRepository   playbookexecution.Repository
 
 	client k8sclient.K8sClient
 }
@@ -70,14 +60,12 @@ func NewRepository(deviceSignedRequestRepository edgedevicesignedrequest.Reposit
 	deviceRepository edgedevice.Repository,
 	workloadRepository edgeworkload.Repository,
 	deviceSetRepository edgedeviceset.Repository,
-	playbookExecutionRepository playbookexecution.Repository,
 	client k8sclient.K8sClient) RepositoryFacade {
 	return &repositoryFacade{
 		deviceSignedRequestRepository: deviceSignedRequestRepository,
 		deviceRepository:              deviceRepository,
 		deviceSetRepository:           deviceSetRepository,
 		workloadRepository:            workloadRepository,
-		playbookExecutionRepository:   playbookExecutionRepository,
 		client:                        client,
 	}
 }
@@ -112,14 +100,6 @@ func (b *repositoryFacade) GetEdgeWorkload(ctx context.Context, name string, nam
 
 func (b *repositoryFacade) GetEdgeDeviceSet(ctx context.Context, name string, namespace string) (*v1alpha1.EdgeDeviceSet, error) {
 	return b.deviceSetRepository.Read(ctx, name, namespace)
-}
-
-func (b *repositoryFacade) GetPlaybookExecution(ctx context.Context, name string, namespace string) (*v1alpha1.PlaybookExecution, error) {
-	return b.playbookExecutionRepository.Read(ctx, name, namespace)
-}
-
-func (b *repositoryFacade) PatchPlaybookExecution(ctx context.Context, old, new *v1alpha1.PlaybookExecution) error {
-	return b.playbookExecutionRepository.Patch(ctx, old, new)
 }
 
 func (b *repositoryFacade) GetSecret(ctx context.Context, name string, namespace string) (*v1.Secret, error) {

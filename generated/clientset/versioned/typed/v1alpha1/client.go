@@ -31,7 +31,6 @@ type ManagementV1alpha1Interface interface {
 	EdgeDeviceSetsGetter
 	EdgeDeviceSignedRequestsGetter
 	EdgeWorkloadsGetter
-	PlaybookExecutionsGetter
 }
 
 // ManagementV1alpha1Client is used to interact with features provided by the management.project-flotta.io group.
@@ -53,10 +52,6 @@ func (c *ManagementV1alpha1Client) EdgeDeviceSignedRequests(namespace string) Ed
 
 func (c *ManagementV1alpha1Client) EdgeWorkloads(namespace string) EdgeWorkloadInterface {
 	return newEdgeWorkloads(c, namespace)
-}
-
-func (c *ManagementV1alpha1Client) PlaybookExecutions(namespace string) PlaybookExecutionInterface {
-	return newPlaybookExecutions(c, namespace)
 }
 
 // NewForConfig creates a new ManagementV1alpha1Client for the given config.

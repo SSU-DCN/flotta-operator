@@ -24,5 +24,3 @@ type EdgeDeviceSetExpansion interface{}
 type EdgeDeviceSignedRequestExpansion interface{}
 
 type EdgeWorkloadExpansion interface{}
-
-type PlaybookExecutionExpansion interface{}

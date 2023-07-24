@@ -12,7 +12,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
-	"github.com/project-flotta/flotta-operator/internal/common/labels"
 	backendapi "github.com/project-flotta/flotta-operator/internal/edgeapi/backend"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/hardware"
 	"github.com/project-flotta/flotta-operator/models"
@@ -104,10 +103,6 @@ func (b *backend) Enrol(ctx context.Context, name, namespace string, enrolmentIn
 	return false, b.repository.CreateEdgeDeviceSignedRequest(ctx, edsr)
 }
 
-func (b *backend) GetEdgeDevice(ctx context.Context, name, namespace string) (*v1alpha1.EdgeDevice, error) {
-	return b.repository.GetEdgeDevice(ctx, name, namespace)
-}
-
 func (b *backend) GetTargetNamespace(ctx context.Context, name, identityNamespace string, matchesCertificate bool) (string, error) {
 	logger := b.logger.With("DeviceID", name)
 	namespace := identityNamespace
@@ -179,27 +174,6 @@ func (b *backend) Register(ctx context.Context, name, namespace string, registra
 
 func (b *backend) UpdateStatus(ctx context.Context, name, namespace string, heartbeat *models.Heartbeat) (bool, error) {
 	return b.heartbeatHandler.Process(ctx, name, namespace, heartbeat)
-}
-
-func (b *backend) GetPlaybookExecutions(ctx context.Context, deviceID, namespace string) ([]*models.PlaybookExecution, error) {
-	logger := b.logger.With("DeviceID", deviceID, "Namespace", namespace)
-	response := []*models.PlaybookExecution{}
-	edgeDevice, err := b.repository.GetEdgeDevice(ctx, deviceID, namespace)
-	if err != nil {
-		return nil, err
-	}
-
-	for labelName, labelValue := range edgeDevice.Labels {
-		if labels.IsEdgeConfigLabel(labelName) {
-			playbookExecution, err := b.repository.GetPlaybookExecution(ctx, fmt.Sprintf("%s-%s", deviceID, labelValue), namespace)
-			if err != nil {
-				logger.Error(err, "cannot get playbook execution ", "playbook execution name ", fmt.Sprintf("%s-%s", deviceID, labelValue))
-				return nil, err
-			}
-			response = append(response, &models.PlaybookExecution{Name: playbookExecution.Name, AnsiblePlaybookString: string(playbookExecution.Spec.Playbook.Content)})
-		}
-	}
-	return response, nil
 }
 
 func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeDevice, updateFunc func(d *v1alpha1.EdgeDevice)) error {

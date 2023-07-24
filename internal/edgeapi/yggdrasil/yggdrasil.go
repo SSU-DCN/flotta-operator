@@ -14,8 +14,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/project-flotta/flotta-operator/internal/common/metrics"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevice"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	backendapi "github.com/project-flotta/flotta-operator/internal/edgeapi/backend"
 	"github.com/project-flotta/flotta-operator/models"
 	"github.com/project-flotta/flotta-operator/pkg/mtls"
@@ -32,32 +30,23 @@ const (
 )
 
 type Handler struct {
-	backend                     backendapi.EdgeDeviceBackend
-	initialNamespace            string
-	metrics                     metrics.Metrics
-	heartbeatHandler            *RetryingDelegatingHandler
-	mtlsConfig                  *mtls.TLSConfig
-	edgeDeviceRepository        edgedevice.Repository
-	playbookExecutionRepository playbookexecution.Repository
-	logger                      *zap.SugaredLogger
+	backend          backendapi.EdgeDeviceBackend
+	initialNamespace string
+	metrics          metrics.Metrics
+	heartbeatHandler *RetryingDelegatingHandler
+	mtlsConfig       *mtls.TLSConfig
+	logger           *zap.SugaredLogger
 }
 
-func NewYggdrasilHandler(
-	initialNamespace string,
-	metrics metrics.Metrics,
-	mtlsConfig *mtls.TLSConfig,
-	logger *zap.SugaredLogger,
-	backend backendapi.EdgeDeviceBackend,
-	edgeDeviceRepository edgedevice.Repository,
-	playbookExecutionRepository playbookexecution.Repository) *Handler {
+func NewYggdrasilHandler(initialNamespace string, metrics metrics.Metrics, mtlsConfig *mtls.TLSConfig, logger *zap.SugaredLogger,
+	backend backendapi.EdgeDeviceBackend) *Handler {
 	return &Handler{
-		initialNamespace:     initialNamespace,
-		metrics:              metrics,
-		heartbeatHandler:     NewRetryingDelegatingHandler(backend),
-		mtlsConfig:           mtlsConfig,
-		edgeDeviceRepository: edgeDeviceRepository,
-		logger:               logger,
-		backend:              backend,
+		initialNamespace: initialNamespace,
+		metrics:          metrics,
+		heartbeatHandler: NewRetryingDelegatingHandler(backend),
+		mtlsConfig:       mtlsConfig,
+		logger:           logger,
+		backend:          backend,
 	}
 }
 
@@ -202,7 +191,7 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 				logger.Debug("Device not found")
 				return operations.NewPostDataMessageForDeviceNotFound()
 			}
-			logger.With("err", err).Error("cannot process heartbeat")
+			logger.With("err", err).Error("Device not found")
 			return operations.NewPostDataMessageForDeviceInternalServerError()
 		}
 		h.metrics.RecordEdgeDevicePresence(h.getNamespace(ctx), deviceID)
@@ -273,40 +262,6 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 		}
 
 		h.metrics.IncEdgeDeviceSuccessfulRegistration()
-		return operations.NewPostDataMessageForDeviceOK().WithPayload(&res)
-	case "ansible":
-		ns := h.getNamespace(ctx)
-		playbookExecutions, err := h.backend.GetPlaybookExecutions(ctx, deviceID, ns)
-
-		if err != nil {
-			if errors.IsNotFound(err) {
-				return operations.NewGetDataMessageForDeviceNotFound()
-			}
-			return operations.NewGetDataMessageForDeviceInternalServerError()
-		}
-		if len(playbookExecutions) == 0 {
-			return operations.NewPostDataMessageForDeviceInternalServerError()
-		}
-
-		res := models.MessageResponse{
-			Directive: msg.Directive,
-			MessageID: msg.MessageID,
-		}
-
-		if len(playbookExecutions) == 0 {
-			return operations.NewPostDataMessageForDeviceOK()
-		}
-		peBytes, err := json.Marshal(playbookExecutions)
-		if err != nil {
-			return operations.NewPostDataMessageForDeviceInternalServerError()
-		}
-		res.Content = string(peBytes)
-		res.Metadata = map[string]string{
-			"message-id":                    uuid.New().String(),
-			"crc_dispatcher_correlation_id": "fake-crc-id", //FIX ME
-			"return_url":                    "return_url",  //FIX ME
-		}
-
 		return operations.NewPostDataMessageForDeviceOK().WithPayload(&res)
 	default:
 		logger.With("message", msg).Info("received unknown message")

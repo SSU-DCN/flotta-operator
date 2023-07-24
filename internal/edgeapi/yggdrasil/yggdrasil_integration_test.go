@@ -30,8 +30,6 @@ import (
 
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/internal/common/metrics"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevice"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/backend/k8s"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/configmaps"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/devicemetrics"
@@ -52,16 +50,14 @@ const (
 
 var _ = Describe("Yggdrasil", func() {
 	var (
-		mockCtrl             *gomock.Controller
-		repositoryMock       *k8s.MockRepositoryFacade
-		playbookExecRepoMock *playbookexecution.MockRepository
-		edgeDeviceRepoMock   *edgedevice.MockRepository
-		metricsMock          *metrics.MockMetrics
-		registryAuth         *images.MockRegistryAuthAPI
-		handler              *yggdrasil.Handler
-		eventsRecorder       *record.FakeRecorder
-		allowListsMock       *devicemetrics.MockAllowListGenerator
-		configMap            *configmaps.MockConfigMap
+		mockCtrl       *gomock.Controller
+		repositoryMock *k8s.MockRepositoryFacade
+		metricsMock    *metrics.MockMetrics
+		registryAuth   *images.MockRegistryAuthAPI
+		handler        *yggdrasil.Handler
+		eventsRecorder *record.FakeRecorder
+		allowListsMock *devicemetrics.MockAllowListGenerator
+		configMap      *configmaps.MockConfigMap
 
 		errorNotFound = errors.NewNotFound(schema.GroupResource{Group: "", Resource: "notfound"}, "notfound")
 		boolTrue      = true
@@ -97,8 +93,6 @@ var _ = Describe("Yggdrasil", func() {
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		repositoryMock = k8s.NewMockRepositoryFacade(mockCtrl)
-		playbookExecRepoMock = playbookexecution.NewMockRepository(mockCtrl)
-		edgeDeviceRepoMock = edgedevice.NewMockRepository(mockCtrl)
 		metricsMock = metrics.NewMockMetrics(mockCtrl)
 		registryAuth = images.NewMockRegistryAuthAPI(mockCtrl)
 		eventsRecorder = record.NewFakeRecorder(1)
@@ -113,7 +107,7 @@ var _ = Describe("Yggdrasil", func() {
 			repositoryMock,
 		)
 		backend := k8s.NewBackend(repositoryMock, assembler, logger.Sugar(), testNamespace, eventsRecorder)
-		handler = yggdrasil.NewYggdrasilHandler(testNamespace, metricsMock, nil, logger.Sugar(), backend, edgeDeviceRepoMock, playbookExecRepoMock)
+		handler = yggdrasil.NewYggdrasilHandler(testNamespace, metricsMock, nil, logger.Sugar(), backend)
 	})
 
 	AfterEach(func() {
@@ -2886,7 +2880,7 @@ var _ = Describe("Yggdrasil", func() {
 						repositoryMock,
 					)
 					backend := k8s.NewBackend(repositoryMock, assembler, logger.Sugar(), testNamespace, eventsRecorder)
-					handler = yggdrasil.NewYggdrasilHandler(testNamespace, metricsMock, MTLSConfig, logger.Sugar(), backend, edgeDeviceRepoMock, playbookExecRepoMock)
+					handler = yggdrasil.NewYggdrasilHandler(testNamespace, metricsMock, MTLSConfig, logger.Sugar(), backend)
 					_, _, err := MTLSConfig.InitCertificates()
 					Expect(err).ToNot(HaveOccurred())
 

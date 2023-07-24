@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -97,12 +98,12 @@ var _ = Describe("EdgeDevice controller", func() {
 
 		getDevice := func(name string) *v1alpha1.EdgeDevice {
 			return &v1alpha1.EdgeDevice{
-				ObjectMeta: metav1.ObjectMeta{
+				ObjectMeta: v1.ObjectMeta{
 					Name:      name,
 					Namespace: "default",
 				},
 				Spec: v1alpha1.EdgeDeviceSpec{
-					RequestTime: &metav1.Time{},
+					RequestTime: &v1.Time{},
 					Heartbeat:   &v1alpha1.HeartbeatConfiguration{},
 				},
 			}
@@ -237,7 +238,7 @@ var _ = Describe("EdgeDevice controller", func() {
 
 			BeforeEach(func() {
 				device = getDevice("test")
-				device.DeletionTimestamp = &metav1.Time{Time: time.Now()}
+				device.DeletionTimestamp = &v1.Time{Time: time.Now()}
 
 				edgeDeviceRepoMock.EXPECT().
 					Read(gomock.Any(), req.Name, req.Namespace).
@@ -245,7 +246,7 @@ var _ = Describe("EdgeDevice controller", func() {
 					Times(1)
 
 				edsr = &v1alpha1.EdgeDeviceSignedRequest{
-					ObjectMeta: metav1.ObjectMeta{Name: req.Name, Namespace: initialNamespace},
+					ObjectMeta: v1.ObjectMeta{Name: req.Name, Namespace: initialNamespace},
 					Spec: v1alpha1.EdgeDeviceSignedRequestSpec{
 						TargetNamespace: initialNamespace,
 						Approved:        false,
@@ -284,7 +285,7 @@ var _ = Describe("EdgeDevice controller", func() {
 			It("Edgedevice signed request is present and deleted", func() {
 				// given
 				device := getDevice("test")
-				device.DeletionTimestamp = &metav1.Time{Time: time.Now()}
+				device.DeletionTimestamp = &v1.Time{Time: time.Now()}
 
 				edgeDeviceSRRepoMock.EXPECT().
 					Read(gomock.Any(), req.Name, initialNamespace).

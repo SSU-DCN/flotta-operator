@@ -217,14 +217,6 @@ func init() {
     }
   },
   "definitions": {
-    "ansible-manager-configuration": {
-      "type": "object",
-      "properties": {
-        "period_seconds": {
-          "type": "integer"
-        }
-      }
-    },
     "boot": {
       "type": "object",
       "properties": {
@@ -338,9 +330,6 @@ func init() {
     "device-configuration": {
       "type": "object",
       "properties": {
-        "ansible-manager": {
-          "$ref": "#/definitions/ansible-manager-configuration"
-        },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"
         },
@@ -370,6 +359,9 @@ func init() {
     "device-configuration-message": {
       "type": "object",
       "properties": {
+        "ansible_playbook": {
+          "type": "string"
+        },
         "configuration": {
           "$ref": "#/definitions/device-configuration"
         },
@@ -595,12 +587,6 @@ func init() {
         "hardware": {
           "$ref": "#/definitions/hardware-info"
         },
-        "playbook-executions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/playbook-execution-status"
-          }
-        },
         "status": {
           "type": "string",
           "enum": [
@@ -813,9 +799,6 @@ func init() {
         },
         "message_id": {
           "type": "string"
-        },
-        "metadata": {
-          "type": "object"
         }
       }
     },
@@ -947,51 +930,6 @@ func init() {
           "description": "the URL of the hosted commits web server",
           "type": "string"
         }
-      }
-    },
-    "playbook-execution": {
-      "type": "object",
-      "properties": {
-        "ansible_playbook_string": {
-          "description": "Returns the ansible playbook as a string.",
-          "type": "string"
-        },
-        "last_data_upload": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "name": {
-          "description": "Returns the ansible playbookexecution name.",
-          "type": "string"
-        }
-      }
-    },
-    "playbook-execution-status": {
-      "type": "object",
-      "properties": {
-        "last_data_upload": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "name": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Deploying",
-            "TargetVerification",
-            "Running",
-            "SuccessfullyCompleted",
-            "CompletedWithError"
-          ]
-        }
-      }
-    },
-    "playbook-executions-response": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/playbook-execution"
       }
     },
     "registration-info": {
@@ -1422,14 +1360,6 @@ func init() {
         }
       }
     },
-    "ansible-manager-configuration": {
-      "type": "object",
-      "properties": {
-        "period_seconds": {
-          "type": "integer"
-        }
-      }
-    },
     "boot": {
       "type": "object",
       "properties": {
@@ -1543,9 +1473,6 @@ func init() {
     "device-configuration": {
       "type": "object",
       "properties": {
-        "ansible-manager": {
-          "$ref": "#/definitions/ansible-manager-configuration"
-        },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"
         },
@@ -1575,6 +1502,9 @@ func init() {
     "device-configuration-message": {
       "type": "object",
       "properties": {
+        "ansible_playbook": {
+          "type": "string"
+        },
         "configuration": {
           "$ref": "#/definitions/device-configuration"
         },
@@ -1801,12 +1731,6 @@ func init() {
         "hardware": {
           "$ref": "#/definitions/hardware-info"
         },
-        "playbook-executions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/playbook-execution-status"
-          }
-        },
         "status": {
           "type": "string",
           "enum": [
@@ -2019,9 +1943,6 @@ func init() {
         },
         "message_id": {
           "type": "string"
-        },
-        "metadata": {
-          "type": "object"
         }
       }
     },
@@ -2153,51 +2074,6 @@ func init() {
           "description": "the URL of the hosted commits web server",
           "type": "string"
         }
-      }
-    },
-    "playbook-execution": {
-      "type": "object",
-      "properties": {
-        "ansible_playbook_string": {
-          "description": "Returns the ansible playbook as a string.",
-          "type": "string"
-        },
-        "last_data_upload": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "name": {
-          "description": "Returns the ansible playbookexecution name.",
-          "type": "string"
-        }
-      }
-    },
-    "playbook-execution-status": {
-      "type": "object",
-      "properties": {
-        "last_data_upload": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "name": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Deploying",
-            "TargetVerification",
-            "Running",
-            "SuccessfullyCompleted",
-            "CompletedWithError"
-          ]
-        }
-      }
-    },
-    "playbook-executions-response": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/playbook-execution"
       }
     },
     "registration-info": {

@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -30,8 +31,6 @@ import (
 
 	managementv1alpha1 "github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/internal/common/metrics"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevice"
-	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/backend/factory"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/yggdrasil"
@@ -106,12 +105,9 @@ func main() {
 		Intermediates: x509.NewCertPool(),
 	}
 
-	playbookExecutionRepository := playbookexecution.NewPlaybookExecutionRepository(c)
-	edgeDeviceRepository := edgedevice.NewEdgeDeviceRepository(c)
-
 	metricsObj := metrics.New()
 
-	corev1Client, err := v1.NewForConfig(clientConfig)
+	corev1Client, err := corev1client.NewForConfig(clientConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -138,8 +134,6 @@ func main() {
 		mtlsConfig,
 		logger,
 		backend,
-		edgeDeviceRepository,
-		playbookExecutionRepository,
 	)
 
 	var api *operations.FlottaManagementAPI
@@ -190,12 +184,7 @@ func main() {
 	mux.Handle("/metrics", promhttp.HandlerFor(crmetrics.Registry, promhttp.HandlerOpts{}))
 	mux.HandleFunc("/healthz", httpOK)
 	mux.HandleFunc("/readyz", httpOK)
-	metricsServer := &http.Server{
-		Addr:              Config.MetricsAddr,
-		Handler:           mux,
-		ReadHeaderTimeout: 3 * time.Second,
-	}
-	logger.Fatal(metricsServer.ListenAndServe())
+	logger.Fatal(http.ListenAndServe(Config.MetricsAddr, mux))
 }
 
 func logger(logLevel string) (error, *zap.SugaredLogger) {

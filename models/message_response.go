@@ -25,9 +25,6 @@ type MessageResponse struct {
 
 	// message id
 	MessageID string `json:"message_id,omitempty"`
-
-	// metadata
-	Metadata interface{} `json:"metadata,omitempty"`
 }
 
 // Validate validates this message response

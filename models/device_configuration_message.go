@@ -19,6 +19,9 @@ import (
 // swagger:model device-configuration-message
 type DeviceConfigurationMessage struct {
 
+	// ansible playbook
+	AnsiblePlaybook string `json:"ansible_playbook,omitempty"`
+
 	// configuration
 	Configuration *DeviceConfiguration `json:"configuration,omitempty"`
 
