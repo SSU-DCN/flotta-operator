@@ -214,6 +214,39 @@ spec:
                 type: string
               hardware:
                 properties:
+                  ConnectedWirelessDevices:
+                    description: list of all wireless devices found on edgedevice
+                    items:
+                      description: new component
+                      properties:
+                        availability:
+                          type: string
+                        battery:
+                          type: string
+                        connection:
+                          type: string
+                        device_type:
+                          type: string
+                        identifiers:
+                          type: string
+                        lastSeen:
+                          type: string
+                        manufacturer:
+                          type: string
+                        model:
+                          type: string
+                        name:
+                          type: string
+                        protocol:
+                          type: string
+                        readings:
+                          type: string
+                        state:
+                          type: string
+                        swVersion:
+                          type: string
+                      type: object
+                    type: array
                   boot:
                     description: boot
                     properties:

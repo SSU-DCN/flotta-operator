@@ -217,6 +217,14 @@ func init() {
     }
   },
   "definitions": {
+    "ansible-manager-configuration": {
+      "type": "object",
+      "properties": {
+        "period_seconds": {
+          "type": "integer"
+        }
+      }
+    },
     "boot": {
       "type": "object",
       "properties": {
@@ -330,6 +338,9 @@ func init() {
     "device-configuration": {
       "type": "object",
       "properties": {
+        "ansible-manager": {
+          "$ref": "#/definitions/ansible-manager-configuration"
+        },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"
         },
@@ -359,9 +370,6 @@ func init() {
     "device-configuration-message": {
       "type": "object",
       "properties": {
-        "ansible_playbook": {
-          "type": "string"
-        },
         "configuration": {
           "$ref": "#/definitions/device-configuration"
         },
@@ -556,6 +564,12 @@ func init() {
         },
         "system_vendor": {
           "$ref": "#/definitions/system_vendor"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },
@@ -586,6 +600,12 @@ func init() {
         },
         "hardware": {
           "$ref": "#/definitions/hardware-info"
+        },
+        "playbook-executions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/playbook-execution-status"
+          }
         },
         "status": {
           "type": "string",
@@ -799,6 +819,9 @@ func init() {
         },
         "message_id": {
           "type": "string"
+        },
+        "metadata": {
+          "type": "object"
         }
       }
     },
@@ -932,6 +955,51 @@ func init() {
         }
       }
     },
+    "playbook-execution": {
+      "type": "object",
+      "properties": {
+        "ansible_playbook_string": {
+          "description": "Returns the ansible playbook as a string.",
+          "type": "string"
+        },
+        "last_data_upload": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "description": "Returns the ansible playbookexecution name.",
+          "type": "string"
+        }
+      }
+    },
+    "playbook-execution-status": {
+      "type": "object",
+      "properties": {
+        "last_data_upload": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Deploying",
+            "TargetVerification",
+            "Running",
+            "SuccessfullyCompleted",
+            "CompletedWithError"
+          ]
+        }
+      }
+    },
+    "playbook-executions-response": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/playbook-execution"
+      }
+    },
     "registration-info": {
       "type": "object",
       "properties": {
@@ -1041,6 +1109,63 @@ func init() {
           ]
         },
         "last_upgrade_time": {
+          "type": "string"
+        }
+      }
+    },
+    "wireless_device": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "description": "Online status of the end device; Online/offline",
+          "type": "string"
+        },
+        "battery": {
+          "description": "Battery percentage of the end device; otherwise null",
+          "type": "string"
+        },
+        "connection": {
+          "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
+          "type": "string"
+        },
+        "device_type": {
+          "description": "Whether the device is a sensor or actuator",
+          "type": "string"
+        },
+        "identifiers": {
+          "description": "unique identifier for device e.g. Serial number",
+          "type": "string"
+        },
+        "last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "readings": {
+          "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
+          "type": "string"
+        },
+        "state": {
+          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+          "type": "string"
+        },
+        "sw_version": {
+          "description": "Software version of the end node device",
           "type": "string"
         }
       }
@@ -1360,6 +1485,14 @@ func init() {
         }
       }
     },
+    "ansible-manager-configuration": {
+      "type": "object",
+      "properties": {
+        "period_seconds": {
+          "type": "integer"
+        }
+      }
+    },
     "boot": {
       "type": "object",
       "properties": {
@@ -1473,6 +1606,9 @@ func init() {
     "device-configuration": {
       "type": "object",
       "properties": {
+        "ansible-manager": {
+          "$ref": "#/definitions/ansible-manager-configuration"
+        },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"
         },
@@ -1502,9 +1638,6 @@ func init() {
     "device-configuration-message": {
       "type": "object",
       "properties": {
-        "ansible_playbook": {
-          "type": "string"
-        },
         "configuration": {
           "$ref": "#/definitions/device-configuration"
         },
@@ -1700,6 +1833,12 @@ func init() {
         },
         "system_vendor": {
           "$ref": "#/definitions/system_vendor"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },
@@ -1730,6 +1869,12 @@ func init() {
         },
         "hardware": {
           "$ref": "#/definitions/hardware-info"
+        },
+        "playbook-executions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/playbook-execution-status"
+          }
         },
         "status": {
           "type": "string",
@@ -1943,6 +2088,9 @@ func init() {
         },
         "message_id": {
           "type": "string"
+        },
+        "metadata": {
+          "type": "object"
         }
       }
     },
@@ -2076,6 +2224,51 @@ func init() {
         }
       }
     },
+    "playbook-execution": {
+      "type": "object",
+      "properties": {
+        "ansible_playbook_string": {
+          "description": "Returns the ansible playbook as a string.",
+          "type": "string"
+        },
+        "last_data_upload": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "description": "Returns the ansible playbookexecution name.",
+          "type": "string"
+        }
+      }
+    },
+    "playbook-execution-status": {
+      "type": "object",
+      "properties": {
+        "last_data_upload": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Deploying",
+            "TargetVerification",
+            "Running",
+            "SuccessfullyCompleted",
+            "CompletedWithError"
+          ]
+        }
+      }
+    },
+    "playbook-executions-response": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/playbook-execution"
+      }
+    },
     "registration-info": {
       "type": "object",
       "properties": {
@@ -2185,6 +2378,63 @@ func init() {
           ]
         },
         "last_upgrade_time": {
+          "type": "string"
+        }
+      }
+    },
+    "wireless_device": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "description": "Online status of the end device; Online/offline",
+          "type": "string"
+        },
+        "battery": {
+          "description": "Battery percentage of the end device; otherwise null",
+          "type": "string"
+        },
+        "connection": {
+          "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
+          "type": "string"
+        },
+        "device_type": {
+          "description": "Whether the device is a sensor or actuator",
+          "type": "string"
+        },
+        "identifiers": {
+          "description": "unique identifier for device e.g. Serial number",
+          "type": "string"
+        },
+        "last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "readings": {
+          "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
+          "type": "string"
+        },
+        "state": {
+          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+          "type": "string"
+        },
+        "sw_version": {
+          "description": "Software version of the end node device",
           "type": "string"
         }
       }

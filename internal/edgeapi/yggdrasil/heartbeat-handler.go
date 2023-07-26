@@ -2,6 +2,7 @@ package yggdrasil
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/backend"
@@ -23,6 +24,25 @@ func NewRetryingDelegatingHandler(delegate StatusUpdater) *RetryingDelegatingHan
 
 func (h *RetryingDelegatingHandler) Process(ctx context.Context, name, namespace string, heartbeat *models.Heartbeat) error {
 	// retry patching the edge device status
+
+	// fmt.Println(heartbeat.Hardware.WirelessDevices)
+	fmt.Printf("%+v\n", heartbeat.Hardware.WirelessDevices)
+
+	for _, item := range heartbeat.Hardware.WirelessDevices {
+		fmt.Printf("Name: %s\n", item.Name)
+		fmt.Printf("Manufacturer: %s\n", item.Manufacturer)
+		fmt.Printf("Model: %s\n", item.Model)
+		fmt.Printf("Software Version: %s\n", item.SwVersion)
+		fmt.Printf("Identifiers: %s\n", item.Identifiers)
+		fmt.Printf("Protocol: %s\n", item.Protocol)
+		fmt.Printf("Connection: %s\n", item.Connection)
+		fmt.Printf("Battery: %s\n", item.Battery)
+		fmt.Printf("Availability: %s\n", item.Availability)
+		fmt.Printf("Device Type: %s\n", item.DeviceType)
+		fmt.Printf("Last Seen: %s\n", item.LastSeen)
+		fmt.Println("--------")
+	}
+
 	var err error
 	var retry bool
 	for i := 1; i < 5; i++ {

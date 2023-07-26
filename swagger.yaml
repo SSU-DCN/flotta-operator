@@ -163,11 +163,11 @@ definitions:
           workloads status and restart those that failed
       secrets:
         $ref: '#/definitions/secret-list'
-      ansible_playbook:
-        type: string
   device-configuration:
     type: object
     properties:
+      ansible-manager:
+        $ref: '#/definitions/ansible-manager-configuration'
       heartbeat:
         $ref: '#/definitions/heartbeat-configuration'
       storage:
@@ -225,6 +225,11 @@ definitions:
       automatically_upgrade:
         type: boolean
         description: automatically upgrade the OS image
+  ansible-manager-configuration:
+    type: object
+    properties:
+      period_seconds:
+        type: integer
   heartbeat-configuration:
     type: object
     properties:
@@ -496,6 +501,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/mount'
+      wireless_devices:
+        type: array
+        items:
+          $ref: '#/definitions/wireless_device'
 
   interface:
     type: object
@@ -678,6 +687,7 @@ definitions:
         description: mount options
         type: string
 
+
   heartbeat:
     type: object
     properties:
@@ -692,6 +702,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/workload-status'
+      playbook-executions:
+        type: array
+        items:
+          $ref: '#/definitions/playbook-execution-status'
       upgrade:
         $ref: '#/definitions/upgrade-status'
       hardware:
@@ -716,6 +730,22 @@ definitions:
         enum:
           - info
           - warn
+  playbook-execution-status:
+    type: object
+    properties:
+      name:
+        type: string
+      last_data_upload:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum:
+          - Deploying
+          - TargetVerification
+          - Running
+          - SuccessfullyCompleted
+          - CompletedWithError
   workload-status:
     type: object
     properties:
@@ -753,6 +783,8 @@ definitions:
         type: string
       content:
         description: Content
+      metadata:
+        type: object
   message:
     type: object
     properties:
@@ -778,3 +810,66 @@ definitions:
         type: object
       content:
         description: Content
+
+  playbook-execution:
+    type: object
+    properties:
+      last_data_upload:
+        type: string
+        format: date-time
+      name:
+        type: string
+        description: >-
+          Returns the ansible playbookexecution name.
+      ansible_playbook_string:
+        type: string
+        description: >-
+          Returns the ansible playbook as a string.
+
+  playbook-executions-response:
+    type: array
+    items:
+      $ref: '#/definitions/playbook-execution'
+
+  wireless_device:
+    type: object
+    properties:
+      name:
+        description: Friendly name of the device. 
+        type: string
+      manufacturer:
+        description: Device Manufacturer of the end node
+        type: string
+      model:
+        description: Model number/string of the end node device
+        type: string
+      sw_version:
+        description: Software version of the end node device
+        type: string
+      identifiers:
+        description: unique identifier for device e.g. Serial number
+        type: string
+      protocol:
+        description: Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
+        type: string
+      connection:
+        description: Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.
+        type: string
+      battery:
+        description: Battery percentage of the end device; otherwise null
+        type: string
+      availability:
+        description: Online status of the end device; Online/offline
+        type: string
+      device_type:
+        description: Whether the device is a sensor or actuator
+        type: string
+      readings:
+        description: if end node device is a sensor, JSON format data will be here otherwise will be null
+        type: string
+      state:
+        description: This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE
+        type: string
+      last_seen:
+        description: The last time the end node transacted
+        type: string

@@ -202,6 +202,9 @@ type Hardware struct {
 
 	// list of all mounts found on edgedevice
 	Mounts []*Mount `json:"mounts,omitempty"`
+
+	// list of all wireless devices found on edgedevice
+	ConnectedWirelessDevices []*WirelessDeviceInfo `json:"ConnectedWirelessDevices,omitempty"`
 }
 
 type Boot struct {
@@ -419,6 +422,23 @@ type Mount struct {
 
 	// Mount options (i.e. rw, suid, dev)
 	Options string `json:"options,omitempty"`
+}
+
+//new component
+type WirelessDeviceInfo struct {
+	Name         string `json:"name,omitempty"`
+	Manufacturer string `json:"manufacturer,omitempty"`
+	Model        string `json:"model,omitempty"`
+	SWVersion    string `json:"swVersion,omitempty"`
+	Identifiers  string `json:"identifiers,omitempty"`
+	Protocol     string `json:"protocol,omitempty"`
+	Connection   string `json:"connection,omitempty"`
+	Battery      string `json:"battery,omitempty"`
+	DeviceType   string `json:"device_type,omitempty"`
+	Availability string `json:"availability,omitempty"`
+	Readings     string `json:"readings,omitempty"`
+	State        string `json:"state,omitempty"`
+	LastSeen     string `json:"lastSeen,omitempty"`
 }
 
 //+kubebuilder:object:root=true

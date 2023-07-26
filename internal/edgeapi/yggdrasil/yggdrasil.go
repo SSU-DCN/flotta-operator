@@ -179,6 +179,9 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 	}
 	switch msg.Directive {
 	case "heartbeat":
+
+		logger.Info("IN HEARTBEAT")
+
 		hb := models.Heartbeat{}
 		contentJson, _ := json.Marshal(msg.Content)
 		err := json.Unmarshal(contentJson, &hb)
