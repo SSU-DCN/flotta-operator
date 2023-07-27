@@ -45,6 +45,9 @@ type EdgeDeviceBackend interface {
 	// (i.e. workload status, events reported by the device, OS upgrade status).
 	// The context might contain value under RetryContextKey.
 	UpdateStatus(ctx context.Context, name, namespace string, heartbeat *models.Heartbeat) (bool, error)
+
+	//NEW CODE
+	HandleWirelessDevices(ctx context.Context, name, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error)
 }
 
 // NotApproved is an error representing situation when edge device had been enrolled but hasn't been approved yet

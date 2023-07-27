@@ -189,6 +189,7 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 			return operations.NewPostDataMessageForDeviceBadRequest()
 		}
 		err = h.heartbeatHandler.Process(ctx, deviceID, h.getNamespace(ctx), &hb)
+		h.backend.HandleWirelessDevices(ctx, deviceID, h.getNamespace(ctx), hb.Hardware.WirelessDevices)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				logger.Debug("Device not found")

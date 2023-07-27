@@ -39,6 +39,8 @@ type EdgeDeviceSpec struct {
 	Metrics       *MetricsConfiguration           `json:"metrics,omitempty"`
 	LogCollection map[string]*LogCollectionConfig `json:"logCollection,omitempty"`
 	Mounts        []*Mount                        `json:"mounts,omitempty"`
+	// list of all wireless devices found on edgedevice
+	WirelessDevices []*WirelessDevices `json:"wirelessDevices,omitempty"`
 }
 
 type MetricsReceiverConfiguration struct {
@@ -204,7 +206,7 @@ type Hardware struct {
 	Mounts []*Mount `json:"mounts,omitempty"`
 
 	// list of all wireless devices found on edgedevice
-	ConnectedWirelessDevices []*WirelessDeviceInfo `json:"ConnectedWirelessDevices,omitempty"`
+	WirelessDevices []*WirelessDevices `json:"ConnectedWirelessDevices,omitempty"`
 }
 
 type Boot struct {
@@ -425,16 +427,16 @@ type Mount struct {
 }
 
 //new component
-type WirelessDeviceInfo struct {
-	Name         string `json:"name,omitempty"`
+type WirelessDevices struct {
+	Name         string `json:"name"`
 	Manufacturer string `json:"manufacturer,omitempty"`
 	Model        string `json:"model,omitempty"`
 	SWVersion    string `json:"swVersion,omitempty"`
-	Identifiers  string `json:"identifiers,omitempty"`
+	Identifiers  string `json:"identifiers"`
 	Protocol     string `json:"protocol,omitempty"`
 	Connection   string `json:"connection,omitempty"`
 	Battery      string `json:"battery,omitempty"`
-	DeviceType   string `json:"device_type,omitempty"`
+	DeviceType   string `json:"deviceType,omitempty"`
 	Availability string `json:"availability,omitempty"`
 	Readings     string `json:"readings,omitempty"`
 	State        string `json:"state,omitempty"`

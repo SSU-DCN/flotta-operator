@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -199,4 +200,78 @@ func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeD
 		}
 	}
 	return err
+}
+
+//NEW CODE
+// ManageWirelessDevices implements backend.EdgeDeviceBackend.
+func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
+	// fmt.Println(heartbeat.Hardware.WirelessDevices)
+	// fmt.Printf("%+v\n", heartbeat.WirelessDevices)
+
+	edgeDevice, _ := b.repository.GetEdgeDevice(ctx, name, namespace)
+	oldEdgeDevice := edgeDevice.DeepCopy()
+	connectedDevices := edgeDevice.Spec.WirelessDevices
+	for _, registeredWirelessDevice := range connectedDevices {
+
+		for _, wirelessDevice := range wirelessDevices {
+			if registeredWirelessDevice.Name == wirelessDevice.Name && registeredWirelessDevice.Identifiers == wirelessDevice.Identifiers {
+
+				registeredWirelessDevice.Manufacturer = wirelessDevice.Manufacturer
+				registeredWirelessDevice.Model = wirelessDevice.Model
+				registeredWirelessDevice.SWVersion = wirelessDevice.SwVersion
+				registeredWirelessDevice.Protocol = wirelessDevice.Protocol
+				registeredWirelessDevice.Connection = wirelessDevice.Connection
+				registeredWirelessDevice.Battery = wirelessDevice.Battery
+				registeredWirelessDevice.DeviceType = wirelessDevice.DeviceType
+				registeredWirelessDevice.Availability = wirelessDevice.Availability
+				registeredWirelessDevice.LastSeen = wirelessDevice.LastSeen
+				if strings.ToLower(wirelessDevice.DeviceType) == "sensor" {
+					registeredWirelessDevice.Readings = wirelessDevice.Readings
+				} else {
+					registeredWirelessDevice.State = wirelessDevice.State
+				}
+
+				err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice)
+				if err != nil {
+					b.logger.Errorf("Error occured updating edgedevice %s with Wireless Devices: %s", err.Error())
+				} else {
+					b.logger.Info("edgedevice updated with WirelessDevices")
+				}
+			} else {
+				convertedDevice := &v1alpha1.WirelessDevices{
+					Name:         wirelessDevice.Name,
+					Manufacturer: wirelessDevice.Manufacturer,
+					Model:        wirelessDevice.Model,
+					SWVersion:    wirelessDevice.SwVersion,
+					Identifiers:  wirelessDevice.Identifiers,
+					Protocol:     wirelessDevice.Protocol,
+					Connection:   wirelessDevice.Connection,
+					Battery:      wirelessDevice.Battery,
+					DeviceType:   wirelessDevice.DeviceType,
+					Availability: wirelessDevice.Availability,
+					Readings:     wirelessDevice.Readings,
+					State:        wirelessDevice.State,
+					LastSeen:     wirelessDevice.LastSeen,
+				}
+
+				if strings.ToLower(wirelessDevice.DeviceType) == "sensor" {
+					registeredWirelessDevice.Readings = wirelessDevice.Readings
+				} else {
+					registeredWirelessDevice.State = wirelessDevice.State
+				}
+
+				// Append the new instance to edgeDevice.Spec.WirelessDevices
+				edgeDevice.Spec.WirelessDevices = append(connectedDevices, convertedDevice)
+
+				err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice)
+				if err != nil {
+					b.logger.Errorf("Error occured patching edgedevice %s with Wireless Devices: %s", err.Error())
+				} else {
+					b.logger.Info("edgedevice patched with WirelessDevices")
+				}
+			}
+		}
+	}
+
+	return false, nil
 }

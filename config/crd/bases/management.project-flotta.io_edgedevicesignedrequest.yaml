@@ -78,7 +78,7 @@ spec:
                               type: string
                             connection:
                               type: string
-                            device_type:
+                            deviceType:
                               type: string
                             identifiers:
                               type: string
@@ -98,6 +98,9 @@ spec:
                               type: string
                             swVersion:
                               type: string
+                          required:
+                          - identifiers
+                          - name
                           type: object
                         type: array
                       boot:
