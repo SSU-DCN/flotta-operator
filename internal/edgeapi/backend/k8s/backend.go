@@ -205,73 +205,74 @@ func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeD
 //NEW CODE
 // ManageWirelessDevices implements backend.EdgeDeviceBackend.
 func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
-	// fmt.Println(heartbeat.Hardware.WirelessDevices)
-	// fmt.Printf("%+v\n", heartbeat.WirelessDevices)
+	edgeDevice, err := b.repository.GetEdgeDevice(ctx, name, namespace)
+	if err != nil {
+		return false, fmt.Errorf("failed to get edge device: %w", err)
+	}
 
-	edgeDevice, _ := b.repository.GetEdgeDevice(ctx, name, namespace)
 	oldEdgeDevice := edgeDevice.DeepCopy()
-	connectedDevices := edgeDevice.Spec.WirelessDevices
-	for _, registeredWirelessDevice := range connectedDevices {
+	registeredDevices := edgeDevice.Spec.WirelessDevices
 
-		for _, wirelessDevice := range wirelessDevices {
-			if registeredWirelessDevice.Name == wirelessDevice.Name && registeredWirelessDevice.Identifiers == wirelessDevice.Identifiers {
+	for _, HBwirelessDevice := range wirelessDevices {
+		// Check if the wireless device has a matching registered device
+		matchedDevice := false
+		for _, registeredWirelessDevice := range registeredDevices {
+			if registeredWirelessDevice.Name == HBwirelessDevice.Name && registeredWirelessDevice.Identifiers == HBwirelessDevice.Identifiers {
+				// Update the fields of the matched registered device
+				registeredWirelessDevice.Manufacturer = HBwirelessDevice.Manufacturer
+				registeredWirelessDevice.Model = HBwirelessDevice.Model
+				registeredWirelessDevice.SWVersion = HBwirelessDevice.SwVersion
+				registeredWirelessDevice.Protocol = HBwirelessDevice.Protocol
+				registeredWirelessDevice.Connection = HBwirelessDevice.Connection
+				registeredWirelessDevice.Battery = HBwirelessDevice.Battery
+				registeredWirelessDevice.DeviceType = HBwirelessDevice.DeviceType
+				registeredWirelessDevice.Availability = HBwirelessDevice.Availability
+				registeredWirelessDevice.LastSeen = HBwirelessDevice.LastSeen
 
-				registeredWirelessDevice.Manufacturer = wirelessDevice.Manufacturer
-				registeredWirelessDevice.Model = wirelessDevice.Model
-				registeredWirelessDevice.SWVersion = wirelessDevice.SwVersion
-				registeredWirelessDevice.Protocol = wirelessDevice.Protocol
-				registeredWirelessDevice.Connection = wirelessDevice.Connection
-				registeredWirelessDevice.Battery = wirelessDevice.Battery
-				registeredWirelessDevice.DeviceType = wirelessDevice.DeviceType
-				registeredWirelessDevice.Availability = wirelessDevice.Availability
-				registeredWirelessDevice.LastSeen = wirelessDevice.LastSeen
-				if strings.ToLower(wirelessDevice.DeviceType) == "sensor" {
-					registeredWirelessDevice.Readings = wirelessDevice.Readings
+				// Update specific fields based on the device type
+				if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+					registeredWirelessDevice.Readings = HBwirelessDevice.Readings
 				} else {
-					registeredWirelessDevice.State = wirelessDevice.State
+					registeredWirelessDevice.State = HBwirelessDevice.State
 				}
 
-				err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice)
-				if err != nil {
-					b.logger.Errorf("Error occured updating edgedevice %s with Wireless Devices: %s", err.Error())
-				} else {
-					b.logger.Info("edgedevice updated with WirelessDevices")
-				}
-			} else {
-				convertedDevice := &v1alpha1.WirelessDevices{
-					Name:         wirelessDevice.Name,
-					Manufacturer: wirelessDevice.Manufacturer,
-					Model:        wirelessDevice.Model,
-					SWVersion:    wirelessDevice.SwVersion,
-					Identifiers:  wirelessDevice.Identifiers,
-					Protocol:     wirelessDevice.Protocol,
-					Connection:   wirelessDevice.Connection,
-					Battery:      wirelessDevice.Battery,
-					DeviceType:   wirelessDevice.DeviceType,
-					Availability: wirelessDevice.Availability,
-					Readings:     wirelessDevice.Readings,
-					State:        wirelessDevice.State,
-					LastSeen:     wirelessDevice.LastSeen,
-				}
-
-				if strings.ToLower(wirelessDevice.DeviceType) == "sensor" {
-					registeredWirelessDevice.Readings = wirelessDevice.Readings
-				} else {
-					registeredWirelessDevice.State = wirelessDevice.State
-				}
-
-				// Append the new instance to edgeDevice.Spec.WirelessDevices
-				edgeDevice.Spec.WirelessDevices = append(connectedDevices, convertedDevice)
-
-				err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice)
-				if err != nil {
-					b.logger.Errorf("Error occured patching edgedevice %s with Wireless Devices: %s", err.Error())
-				} else {
-					b.logger.Info("edgedevice patched with WirelessDevices")
-				}
+				matchedDevice = true
+				break
 			}
+		}
+
+		if !matchedDevice {
+			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
+			convertedDevice := &v1alpha1.WirelessDevices{
+				Name:         HBwirelessDevice.Name,
+				Manufacturer: HBwirelessDevice.Manufacturer,
+				Model:        HBwirelessDevice.Model,
+				SWVersion:    HBwirelessDevice.SwVersion,
+				Identifiers:  HBwirelessDevice.Identifiers,
+				Protocol:     HBwirelessDevice.Protocol,
+				Connection:   HBwirelessDevice.Connection,
+				Battery:      HBwirelessDevice.Battery,
+				DeviceType:   HBwirelessDevice.DeviceType,
+				Availability: HBwirelessDevice.Availability,
+				LastSeen:     HBwirelessDevice.LastSeen,
+			}
+
+			// Set specific fields based on the device type
+			if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+				convertedDevice.Readings = HBwirelessDevice.Readings
+			} else {
+				convertedDevice.State = HBwirelessDevice.State
+			}
+
+			// Append the new instance to edgeDevice.Spec.WirelessDevices
+			edgeDevice.Spec.WirelessDevices = append(registeredDevices, convertedDevice)
 		}
 	}
 
-	return false, nil
+	// Patch the edgeDevice with the updated or added devices
+	if err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice); err != nil {
+		return false, fmt.Errorf("failed to patch edge device: %w", err)
+	}
+
+	return true, nil
 }
