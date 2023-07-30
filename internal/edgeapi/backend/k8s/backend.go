@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -225,4 +226,79 @@ func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeD
 		}
 	}
 	return err
+}
+
+//NEW CODE
+// ManageWirelessDevices implements backend.EdgeDeviceBackend.
+func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
+	edgeDevice, err := b.repository.GetEdgeDevice(ctx, name, namespace)
+	if err != nil {
+		return false, fmt.Errorf("failed to get edge device: %w", err)
+	}
+
+	oldEdgeDevice := edgeDevice.DeepCopy()
+	registeredDevices := edgeDevice.Spec.WirelessDevices
+
+	for _, HBwirelessDevice := range wirelessDevices {
+		// Check if the wireless device has a matching registered device
+		matchedDevice := false
+		for _, registeredWirelessDevice := range registeredDevices {
+			if registeredWirelessDevice.Name == HBwirelessDevice.Name && registeredWirelessDevice.Identifiers == HBwirelessDevice.Identifiers {
+				// Update the fields of the matched registered device
+				registeredWirelessDevice.Manufacturer = HBwirelessDevice.Manufacturer
+				registeredWirelessDevice.Model = HBwirelessDevice.Model
+				registeredWirelessDevice.SWVersion = HBwirelessDevice.SwVersion
+				registeredWirelessDevice.Protocol = HBwirelessDevice.Protocol
+				registeredWirelessDevice.Connection = HBwirelessDevice.Connection
+				registeredWirelessDevice.Battery = HBwirelessDevice.Battery
+				registeredWirelessDevice.DeviceType = HBwirelessDevice.DeviceType
+				registeredWirelessDevice.Availability = HBwirelessDevice.Availability
+				registeredWirelessDevice.LastSeen = HBwirelessDevice.LastSeen
+
+				// Update specific fields based on the device type
+				if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+					registeredWirelessDevice.Readings = HBwirelessDevice.Readings
+				} else {
+					registeredWirelessDevice.State = HBwirelessDevice.State
+				}
+
+				matchedDevice = true
+				break
+			}
+		}
+
+		if !matchedDevice {
+			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
+			convertedDevice := &v1alpha1.WirelessDevices{
+				Name:         HBwirelessDevice.Name,
+				Manufacturer: HBwirelessDevice.Manufacturer,
+				Model:        HBwirelessDevice.Model,
+				SWVersion:    HBwirelessDevice.SwVersion,
+				Identifiers:  HBwirelessDevice.Identifiers,
+				Protocol:     HBwirelessDevice.Protocol,
+				Connection:   HBwirelessDevice.Connection,
+				Battery:      HBwirelessDevice.Battery,
+				DeviceType:   HBwirelessDevice.DeviceType,
+				Availability: HBwirelessDevice.Availability,
+				LastSeen:     HBwirelessDevice.LastSeen,
+			}
+
+			// Set specific fields based on the device type
+			if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+				convertedDevice.Readings = HBwirelessDevice.Readings
+			} else {
+				convertedDevice.State = HBwirelessDevice.State
+			}
+
+			// Append the new instance to edgeDevice.Spec.WirelessDevices
+			edgeDevice.Spec.WirelessDevices = append(registeredDevices, convertedDevice)
+		}
+	}
+
+	// Patch the edgeDevice with the updated or added devices
+	if err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice); err != nil {
+		return false, fmt.Errorf("failed to patch edge device: %w", err)
+	}
+
+	return true, nil
 }

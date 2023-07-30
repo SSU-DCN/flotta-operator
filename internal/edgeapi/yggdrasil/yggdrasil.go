@@ -190,19 +190,27 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 	}
 	switch msg.Directive {
 	case "heartbeat":
+		logger.Info("IN HEARTBEAT")
+
 		hb := models.Heartbeat{}
 		contentJson, _ := json.Marshal(msg.Content)
 		err := json.Unmarshal(contentJson, &hb)
 		if err != nil {
 			return operations.NewPostDataMessageForDeviceBadRequest()
 		}
+		_, err = h.backend.HandleWirelessDevices(ctx, deviceID, h.getNamespace(ctx), hb.Hardware.WirelessDevices)
+		if err != nil {
+			logger.Errorf("Edge device in HB %s", err)
+		}
+
 		err = h.heartbeatHandler.Process(ctx, deviceID, h.getNamespace(ctx), &hb)
+
 		if err != nil {
 			if errors.IsNotFound(err) {
 				logger.Debug("Device not found")
 				return operations.NewPostDataMessageForDeviceNotFound()
 			}
-			logger.With("err", err).Error("cannot process heartbeat")
+			logger.With("err", err).Error("Device not found")
 			return operations.NewPostDataMessageForDeviceInternalServerError()
 		}
 		h.metrics.RecordEdgeDevicePresence(h.getNamespace(ctx), deviceID)

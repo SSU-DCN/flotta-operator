@@ -20,6 +20,11 @@ type backend struct {
 	backendApi       *client.FlottaBackendAPI
 }
 
+// HandleWirelessDevices implements backend.EdgeDeviceBackend.
+func (*backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
+	panic("unimplemented")
+}
+
 func NewBackend(initialNamespace string, backendApi *client.FlottaBackendAPI, timeout time.Duration, logger *zap.SugaredLogger) *backend {
 	return &backend{
 		timeout:          timeout,

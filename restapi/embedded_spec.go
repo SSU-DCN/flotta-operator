@@ -564,6 +564,12 @@ func init() {
         },
         "system_vendor": {
           "$ref": "#/definitions/system_vendor"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },
@@ -1103,6 +1109,63 @@ func init() {
           ]
         },
         "last_upgrade_time": {
+          "type": "string"
+        }
+      }
+    },
+    "wireless_device": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "description": "Online status of the end device; Online/offline",
+          "type": "string"
+        },
+        "battery": {
+          "description": "Battery percentage of the end device; otherwise null",
+          "type": "string"
+        },
+        "connection": {
+          "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
+          "type": "string"
+        },
+        "device_type": {
+          "description": "Whether the device is a sensor or actuator",
+          "type": "string"
+        },
+        "identifiers": {
+          "description": "unique identifier for device e.g. Serial number",
+          "type": "string"
+        },
+        "last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "readings": {
+          "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
+          "type": "string"
+        },
+        "state": {
+          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+          "type": "string"
+        },
+        "sw_version": {
+          "description": "Software version of the end node device",
           "type": "string"
         }
       }
@@ -1770,6 +1833,12 @@ func init() {
         },
         "system_vendor": {
           "$ref": "#/definitions/system_vendor"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },
@@ -2309,6 +2378,63 @@ func init() {
           ]
         },
         "last_upgrade_time": {
+          "type": "string"
+        }
+      }
+    },
+    "wireless_device": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "description": "Online status of the end device; Online/offline",
+          "type": "string"
+        },
+        "battery": {
+          "description": "Battery percentage of the end device; otherwise null",
+          "type": "string"
+        },
+        "connection": {
+          "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
+          "type": "string"
+        },
+        "device_type": {
+          "description": "Whether the device is a sensor or actuator",
+          "type": "string"
+        },
+        "identifiers": {
+          "description": "unique identifier for device e.g. Serial number",
+          "type": "string"
+        },
+        "last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "readings": {
+          "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
+          "type": "string"
+        },
+        "state": {
+          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+          "type": "string"
+        },
+        "sw_version": {
+          "description": "Software version of the end node device",
           "type": "string"
         }
       }

@@ -48,6 +48,9 @@ type HardwareInfo struct {
 
 	// system vendor
 	SystemVendor *SystemVendor `json:"system_vendor,omitempty"`
+
+	// wireless devices
+	WirelessDevices []*WirelessDevice `json:"wireless_devices"`
 }
 
 // Validate validates this hardware info
@@ -87,6 +90,10 @@ func (m *HardwareInfo) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSystemVendor(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWirelessDevices(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -302,6 +309,32 @@ func (m *HardwareInfo) validateSystemVendor(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *HardwareInfo) validateWirelessDevices(formats strfmt.Registry) error {
+	if swag.IsZero(m.WirelessDevices) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.WirelessDevices); i++ {
+		if swag.IsZero(m.WirelessDevices[i]) { // not required
+			continue
+		}
+
+		if m.WirelessDevices[i] != nil {
+			if err := m.WirelessDevices[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // ContextValidate validate this hardware info based on the context it is used
 func (m *HardwareInfo) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -339,6 +372,10 @@ func (m *HardwareInfo) ContextValidate(ctx context.Context, formats strfmt.Regis
 	}
 
 	if err := m.contextValidateSystemVendor(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWirelessDevices(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -507,6 +544,26 @@ func (m *HardwareInfo) contextValidateSystemVendor(ctx context.Context, formats 
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *HardwareInfo) contextValidateWirelessDevices(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.WirelessDevices); i++ {
+
+		if m.WirelessDevices[i] != nil {
+			if err := m.WirelessDevices[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

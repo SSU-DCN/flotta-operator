@@ -206,6 +206,42 @@ spec:
                         type: string
                     type: object
                 type: object
+              wirelessDevices:
+                description: list of all wireless devices found on edgedevice
+                items:
+                  description: new component
+                  properties:
+                    availability:
+                      type: string
+                    battery:
+                      type: string
+                    connection:
+                      type: string
+                    deviceType:
+                      type: string
+                    identifiers:
+                      type: string
+                    lastSeen:
+                      type: string
+                    manufacturer:
+                      type: string
+                    model:
+                      type: string
+                    name:
+                      type: string
+                    protocol:
+                      type: string
+                    readings:
+                      type: string
+                    state:
+                      type: string
+                    swVersion:
+                      type: string
+                  required:
+                  - identifiers
+                  - name
+                  type: object
+                type: array
             type: object
           status:
             description: EdgeDeviceStatus defines the observed state of EdgeDevice
