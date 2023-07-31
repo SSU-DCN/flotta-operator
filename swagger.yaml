@@ -184,6 +184,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/mount'
+      wireless_devices:
+        type: array
+        items:
+          $ref: '#/definitions/wireless_device'
 
   metrics-receiver-configuration:
     type: object

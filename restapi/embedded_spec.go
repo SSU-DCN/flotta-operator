@@ -364,6 +364,12 @@ func init() {
         },
         "storage": {
           "$ref": "#/definitions/storage-configuration"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },
@@ -1632,6 +1638,12 @@ func init() {
         },
         "storage": {
           "$ref": "#/definitions/storage-configuration"
+        },
+        "wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/wireless_device"
+          }
         }
       }
     },

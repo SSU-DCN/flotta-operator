@@ -40,6 +40,9 @@ type DeviceConfiguration struct {
 
 	// storage
 	Storage *StorageConfiguration `json:"storage,omitempty"`
+
+	// wireless devices
+	WirelessDevices []*WirelessDevice `json:"wireless_devices"`
 }
 
 // Validate validates this device configuration
@@ -71,6 +74,10 @@ func (m *DeviceConfiguration) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStorage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateWirelessDevices(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -227,6 +234,32 @@ func (m *DeviceConfiguration) validateStorage(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *DeviceConfiguration) validateWirelessDevices(formats strfmt.Registry) error {
+	if swag.IsZero(m.WirelessDevices) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.WirelessDevices); i++ {
+		if swag.IsZero(m.WirelessDevices[i]) { // not required
+			continue
+		}
+
+		if m.WirelessDevices[i] != nil {
+			if err := m.WirelessDevices[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // ContextValidate validate this device configuration based on the context it is used
 func (m *DeviceConfiguration) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -256,6 +289,10 @@ func (m *DeviceConfiguration) ContextValidate(ctx context.Context, formats strfm
 	}
 
 	if err := m.contextValidateStorage(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWirelessDevices(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -375,6 +412,26 @@ func (m *DeviceConfiguration) contextValidateStorage(ctx context.Context, format
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *DeviceConfiguration) contextValidateWirelessDevices(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.WirelessDevices); i++ {
+
+		if m.WirelessDevices[i] != nil {
+			if err := m.WirelessDevices[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
