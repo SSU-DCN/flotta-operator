@@ -238,27 +238,42 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 
 	oldEdgeDevice := edgeDevice.DeepCopy()
 	SpecRegisteredDevices := oldEdgeDevice.Spec.WirelessDevices
-	// patch := client.MergeFrom(oldEdgeDevice)
+	StatusRegisteredDevices := oldEdgeDevice.Status.WirelessDevices
+	patch := client.MergeFrom(oldEdgeDevice)
 
-	b.logger.Info("Received ", len(wirelessDevices), " Devices")
-	var i = 1
 	// matchedDevice := false
 	for _, HBwirelessDevice := range wirelessDevices {
 		// Check if the wireless device has a matching registered device
-
-		// for _, registeredWirelessDevice := range SpecRegisteredDevices {
-		// 	if registeredWirelessDevice.Name == HBwirelessDevice.Name && registeredWirelessDevice.Identifiers == HBwirelessDevice.Identifiers {
-		// 		matchedDevice = true
-		// 		break
-		// 	}
-		// }
-		b.logger.Info("Count ", i, " Devices")
-		b.logger.Info("Working with ", HBwirelessDevice.Name, " Device")
-
 		matchedDevice := searchWirelessDevice(SpecRegisteredDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
-		b.logger.Info("Got ", matchedDevice, " IF")
 
 		if !matchedDevice {
+			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
+			convertedDevice := &v1alpha1.WirelessDevices{
+				Name:         HBwirelessDevice.Name,
+				Manufacturer: HBwirelessDevice.Manufacturer,
+				Model:        HBwirelessDevice.Model,
+				SWVersion:    HBwirelessDevice.SwVersion,
+				Identifiers:  HBwirelessDevice.Identifiers,
+				Protocol:     HBwirelessDevice.Protocol,
+				Connection:   HBwirelessDevice.Connection,
+				DeviceType:   HBwirelessDevice.DeviceType,
+			}
+
+			// Set specific fields based on the device type
+			if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+				convertedDevice.Readings = HBwirelessDevice.Readings
+			} else {
+				convertedDevice.State = HBwirelessDevice.State
+			}
+
+			// Append the new instance to edgeDevice.Spec.WirelessDevices
+			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
+		}
+
+		//for the status
+		matchedDeviceStatus := searchWirelessDevice(StatusRegisteredDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
+
+		if !matchedDeviceStatus {
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
 			convertedDevice := &v1alpha1.WirelessDevices{
 				Name:         HBwirelessDevice.Name,
@@ -282,16 +297,20 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			}
 
 			// Append the new instance to edgeDevice.Spec.WirelessDevices
-			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
-			i++
+			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
 		}
 
 	}
 
-	b.logger.Info("Updated ", len(edgeDevice.Spec.WirelessDevices), " Devices")
+	edgeDeviceUP := edgeDevice.DeepCopy()
 
 	// Patch the edgeDevice with the updated or added devices
-	if err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice); err != nil {
+	if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
+		return false, fmt.Errorf("failed to patch edge device status: %w", err)
+	}
+
+	// Patch the edgeDevice with the updated or added devices
+	if err := b.repository.PatchEdgeDevice(ctx, edgeDevice, edgeDeviceUP); err != nil {
 		return false, fmt.Errorf("failed to patch edge device: %w", err)
 	}
 

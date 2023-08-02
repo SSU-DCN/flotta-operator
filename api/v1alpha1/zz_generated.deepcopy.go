@@ -695,8 +695,14 @@ func (in *EdgeDeviceStatus) DeepCopyInto(out *EdgeDeviceStatus) {
 	}
 	if in.WirelessDevices != nil {
 		in, out := &in.WirelessDevices, &out.WirelessDevices
-		*out = make([]WirelessDevices, len(*in))
-		copy(*out, *in)
+		*out = make([]*WirelessDevices, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(WirelessDevices)
+				**out = **in
+			}
+		}
 	}
 	if in.Workloads != nil {
 		in, out := &in.Workloads, &out.Workloads

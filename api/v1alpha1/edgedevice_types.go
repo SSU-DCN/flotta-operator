@@ -146,7 +146,7 @@ type EdgeDeviceStatus struct {
 	LastSyncedResourceVersion string    `json:"lastSyncedResourceVersion,omitempty"`
 	Hardware                  *Hardware `json:"hardware,omitempty"`
 	// list of all wireless devices found on edgedevice
-	WirelessDevices    []WirelessDevices   `json:"wirelessDevices,omitempty"`
+	WirelessDevices    []*WirelessDevices  `json:"wirelessDevices,omitempty"`
 	Workloads          []Workload          `json:"workloads,omitempty"`
 	PlaybookExecutions []PlaybookExec      `json:"PlaybookExec,omitempty"`
 	DataOBC            *string             `json:"dataObc,omitempty"`
