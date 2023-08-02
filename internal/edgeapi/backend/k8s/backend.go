@@ -237,35 +237,26 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 	}
 
 	oldEdgeDevice := edgeDevice.DeepCopy()
-	registeredDevices := edgeDevice.Spec.WirelessDevices
+	SpecRegisteredDevices := oldEdgeDevice.Spec.WirelessDevices
+	// patch := client.MergeFrom(oldEdgeDevice)
 
+	b.logger.Info("Received ", len(wirelessDevices), " Devices")
+	var i = 1
+	// matchedDevice := false
 	for _, HBwirelessDevice := range wirelessDevices {
 		// Check if the wireless device has a matching registered device
-		matchedDevice := false
-		for _, registeredWirelessDevice := range registeredDevices {
-			if registeredWirelessDevice.Name == HBwirelessDevice.Name && registeredWirelessDevice.Identifiers == HBwirelessDevice.Identifiers {
-				// Update the fields of the matched registered device
-				registeredWirelessDevice.Manufacturer = HBwirelessDevice.Manufacturer
-				registeredWirelessDevice.Model = HBwirelessDevice.Model
-				registeredWirelessDevice.SWVersion = HBwirelessDevice.SwVersion
-				registeredWirelessDevice.Protocol = HBwirelessDevice.Protocol
-				registeredWirelessDevice.Connection = HBwirelessDevice.Connection
-				registeredWirelessDevice.Battery = HBwirelessDevice.Battery
-				registeredWirelessDevice.DeviceType = HBwirelessDevice.DeviceType
-				registeredWirelessDevice.Availability = HBwirelessDevice.Availability
-				registeredWirelessDevice.LastSeen = HBwirelessDevice.LastSeen
 
-				// Update specific fields based on the device type
-				if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
-					registeredWirelessDevice.Readings = HBwirelessDevice.Readings
-				} else {
-					registeredWirelessDevice.State = HBwirelessDevice.State
-				}
+		// for _, registeredWirelessDevice := range SpecRegisteredDevices {
+		// 	if registeredWirelessDevice.Name == HBwirelessDevice.Name && registeredWirelessDevice.Identifiers == HBwirelessDevice.Identifiers {
+		// 		matchedDevice = true
+		// 		break
+		// 	}
+		// }
+		b.logger.Info("Count ", i, " Devices")
+		b.logger.Info("Working with ", HBwirelessDevice.Name, " Device")
 
-				matchedDevice = true
-				break
-			}
-		}
+		matchedDevice := searchWirelessDevice(SpecRegisteredDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
+		b.logger.Info("Got ", matchedDevice, " IF")
 
 		if !matchedDevice {
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
@@ -291,9 +282,13 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			}
 
 			// Append the new instance to edgeDevice.Spec.WirelessDevices
-			edgeDevice.Spec.WirelessDevices = append(registeredDevices, convertedDevice)
+			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
+			i++
 		}
+
 	}
+
+	b.logger.Info("Updated ", len(edgeDevice.Spec.WirelessDevices), " Devices")
 
 	// Patch the edgeDevice with the updated or added devices
 	if err := b.repository.PatchEdgeDevice(ctx, oldEdgeDevice, edgeDevice); err != nil {
@@ -301,4 +296,13 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 	}
 
 	return true, nil
+}
+
+func searchWirelessDevice(slice []*v1alpha1.WirelessDevices, targetName, targetIdentifiers string) bool {
+	for _, device := range slice {
+		if device.Name == targetName && device.Identifiers == targetIdentifiers {
+			return true // Found the target WirelessDevice in the slice
+		}
+	}
+	return false // Target WirelessDevice not found in the slice
 }

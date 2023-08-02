@@ -287,7 +287,7 @@ func (a *ConfigurationAssembler) getMountConfiguration(ctx context.Context, edge
 func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Context, edgeDevice *v1alpha1.EdgeDevice, logger *zap.SugaredLogger) []*models.WirelessDevice {
 	wirelessDeviceConfigSpec := edgeDevice.Spec.WirelessDevices
 
-	logger.Info("GET DEVICES CONFIG")
+	// logger.Info("GET DEVICES CONFIG")
 
 	if wirelessDeviceConfigSpec == nil {
 		return []*models.WirelessDevice{}
@@ -323,20 +323,20 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 		wireless_devices = append(wireless_devices, wireless_device)
 	}
 
-	for _, item := range wireless_devices {
-		fmt.Printf("Name: %s\n", item.Name)
-		fmt.Printf("Manufacturer: %s\n", item.Manufacturer)
-		fmt.Printf("Model: %s\n", item.Model)
-		fmt.Printf("Software Version: %s\n", item.SwVersion)
-		fmt.Printf("Identifiers: %s\n", item.Identifiers)
-		fmt.Printf("Protocol: %s\n", item.Protocol)
-		fmt.Printf("Connection: %s\n", item.Connection)
-		fmt.Printf("Battery: %s\n", item.Battery)
-		fmt.Printf("Availability: %s\n", item.Availability)
-		fmt.Printf("Device Type: %s\n", item.DeviceType)
-		fmt.Printf("Last Seen: %s\n", item.LastSeen)
-		fmt.Println("--------")
-	}
+	// for _, item := range wireless_devices {
+	// 	fmt.Printf("Name: %s\n", item.Name)
+	// 	fmt.Printf("Manufacturer: %s\n", item.Manufacturer)
+	// 	fmt.Printf("Model: %s\n", item.Model)
+	// 	fmt.Printf("Software Version: %s\n", item.SwVersion)
+	// 	fmt.Printf("Identifiers: %s\n", item.Identifiers)
+	// 	fmt.Printf("Protocol: %s\n", item.Protocol)
+	// 	fmt.Printf("Connection: %s\n", item.Connection)
+	// 	fmt.Printf("Battery: %s\n", item.Battery)
+	// 	fmt.Printf("Availability: %s\n", item.Availability)
+	// 	fmt.Printf("Device Type: %s\n", item.DeviceType)
+	// 	fmt.Printf("Last Seen: %s\n", item.LastSeen)
+	// 	fmt.Println("--------")
+	// }
 
 	return wireless_devices
 }

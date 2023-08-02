@@ -142,13 +142,15 @@ type HardwareProfileConfiguration struct {
 
 // EdgeDeviceStatus defines the observed state of EdgeDevice
 type EdgeDeviceStatus struct {
-	Phase                     string              `json:"phase,omitempty"`
-	LastSyncedResourceVersion string              `json:"lastSyncedResourceVersion,omitempty"`
-	Hardware                  *Hardware           `json:"hardware,omitempty"`
-	Workloads                 []Workload          `json:"workloads,omitempty"`
-	PlaybookExecutions        []PlaybookExec      `json:"PlaybookExec,omitempty"`
-	DataOBC                   *string             `json:"dataObc,omitempty"`
-	UpgradeInformation        *UpgradeInformation `json:"upgradeInformation,omitempty"`
+	Phase                     string    `json:"phase,omitempty"`
+	LastSyncedResourceVersion string    `json:"lastSyncedResourceVersion,omitempty"`
+	Hardware                  *Hardware `json:"hardware,omitempty"`
+	// list of all wireless devices found on edgedevice
+	WirelessDevices    []WirelessDevices   `json:"wirelessDevices,omitempty"`
+	Workloads          []Workload          `json:"workloads,omitempty"`
+	PlaybookExecutions []PlaybookExec      `json:"PlaybookExec,omitempty"`
+	DataOBC            *string             `json:"dataObc,omitempty"`
+	UpgradeInformation *UpgradeInformation `json:"upgradeInformation,omitempty"`
 }
 
 type EdgeWorkloadPhase string

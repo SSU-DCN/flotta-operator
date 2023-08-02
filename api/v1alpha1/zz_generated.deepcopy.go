@@ -693,6 +693,11 @@ func (in *EdgeDeviceStatus) DeepCopyInto(out *EdgeDeviceStatus) {
 		*out = new(Hardware)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.WirelessDevices != nil {
+		in, out := &in.WirelessDevices, &out.WirelessDevices
+		*out = make([]WirelessDevices, len(*in))
+		copy(*out, *in)
+	}
 	if in.Workloads != nil {
 		in, out := &in.Workloads, &out.Workloads
 		*out = make([]Workload, len(*in))
