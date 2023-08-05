@@ -267,13 +267,14 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 				convertedDevice.State = HBwirelessDevice.State
 			}
 
+			// Append the new instance to edgeDevice.Spec.WirelessDevices
+			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
+
 			//check if the end node data matches the autoconfig
 			hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice, HBwirelessDevice)
 			if !hasApplied {
-				b.logger.Error(err)
+				b.logger.Error("An error occurred apply for EndNodeAutoConfig: %s", err.Error())
 			}
-			// Append the new instance to edgeDevice.Spec.WirelessDevices
-			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
 		}
 
 		//for the status
@@ -310,15 +311,24 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 
 	edgeDeviceUP := edgeDevice.DeepCopy()
 
-	// Patch the edgeDevice with the updated or added devices
-	if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
-		return false, fmt.Errorf("failed to patch edge device status: %w", err)
+	if patch == nil {
+		fmt.Println("")
+	}
+	if edgeDeviceUP == nil {
+		fmt.Println("")
 	}
 
+	fmt.Println("Updated Check")
+
 	// Patch the edgeDevice with the updated or added devices
-	if err := b.repository.PatchEdgeDevice(ctx, edgeDevice, edgeDeviceUP); err != nil {
-		return false, fmt.Errorf("failed to patch edge device: %w", err)
-	}
+	// if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
+	// 	return false, fmt.Errorf("failed to patch edge device status: %w", err)
+	// }
+
+	// // Patch the edgeDevice with the updated or added devices
+	// if err := b.repository.PatchEdgeDevice(ctx, edgeDevice, edgeDeviceUP); err != nil {
+	// 	return false, fmt.Errorf("failed to patch edge device: %w", err)
+	// }
 
 	return true, nil
 }
@@ -333,26 +343,43 @@ func searchWirelessDevice(slice []*v1alpha1.WirelessDevices, targetName, targetI
 }
 
 func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, device *v1alpha1.EdgeDevice, wirelessDevice *models.WirelessDevice) (bool, error) {
-	logger := b.logger.With("DeviceID", device.Name)
+
+	b.logger.Infof("WE ARE IN THE FUNCTION")
+
+	// logger := b.logger.With("DeviceID", device.Name)
 
 	listEndNodeAutoConfig, err := b.repository.ListEndNodeAutoConfigByEdgeDevice(ctx, device.Namespace, device.Name)
 	if err != nil {
 		return false, err
 	}
 
-	if len(listEndNodeAutoConfig) > 0 {
-		return false, err
+	if len(listEndNodeAutoConfig) == 0 {
+		return false, fmt.Errorf("%s", "No EndNodeAutoConfig resources")
 	}
+
+	b.logger.Infof("WE ARE IN THE FUNCTION 2")
 
 	var endNodeAutoConfig *v1alpha1.EndNodeAutoConfig
 	// fetch all configs in the namespace
 	for _, item := range listEndNodeAutoConfig {
-		if item.Spec.Configuration.Connection == wirelessDevice.Connection && item.Spec.Configuration.Protocol == wirelessDevice.Protocol {
+		fmt.Println("HEY ERROR")
+		b.logger.Info(item.Spec.Configuration.Connection, "item.Spec.Configuration.Connection")
+		b.logger.Info(item.Spec.Configuration.Protocol, "item.Spec.Configuration.Protocol")
+		b.logger.Info(wirelessDevice.Connection, "wirelessDevice.Connection")
+		b.logger.Info(wirelessDevice.Connection, "wirelessDevice.Protocol")
+		if strings.ToLower(item.Spec.Configuration.Protocol) == strings.ToLower(wirelessDevice.Connection) || strings.ToLower(item.Spec.Configuration.Protocol) == strings.ToLower(wirelessDevice.Protocol) {
 			// Found the matching EndNodeAutoConfig resource, return it.
+			b.logger.Info("MatchedHERE")
 			endNodeAutoConfig = item
 			break
 		}
 	}
+
+	if endNodeAutoConfig == nil {
+		b.logger.Error("No EndNodeAutoConfig resources")
+		return false, fmt.Errorf("%s", "No EndNodeAutoConfig resources")
+	}
+	b.logger.Infof("WE ARE IN THE FUNCTION 3")
 
 	deviceConfigPlugins := []v1.Container{}
 	for _, item := range endNodeAutoConfig.Spec.Configuration.DevicePlugin.Containers {
@@ -410,12 +437,12 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, devic
 	workloadCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDeviceWorkloads)
 	if pluginCreateError != nil || workloadCreateError != nil {
 		if pluginCreateError != nil {
-			logger.Errorf("Failed to create endNode Plugin ", pluginCreateError)
+			// logger.Errorf("Failed to create endNode Plugin ", pluginCreateError)
 			return false, pluginCreateError
 		}
 
 		if workloadCreateError != nil {
-			logger.Errorf("Failed to create endNode Workloads ", workloadCreateError)
+			// logger.Errorf("Failed to create endNode Workloads ", workloadCreateError)
 			return false, workloadCreateError
 		}
 	}

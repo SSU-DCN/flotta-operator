@@ -2,5 +2,18 @@ apiVersion: management.project-flotta.io/v1alpha1
 kind: EndNodeAutoConfig
 metadata:
   name: endnodeautoconfig-sample
+  namespace: default
 spec:
-  # TODO(user): Add fields here
+  device: 53974c0582c543c28f81ba29cf6eb07b
+  configuration:
+    protocol: MQTT
+    connection: Wi-Fi
+    devicePlugin:
+      containers:
+        - name: device-plugin
+          image: quay.io/bitnami/nginx:1.20
+    workloadSpec:
+      containers:
+        - name: workload-iot
+          image: quay.io/bitnami/nginx:1.20
+

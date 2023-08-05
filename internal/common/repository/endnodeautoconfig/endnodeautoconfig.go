@@ -2,6 +2,7 @@ package endnodeautoconfig
 
 import (
 	"context"
+	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -92,6 +93,8 @@ func (r *CRRepository) ListByNamespace(ctx context.Context, namespace string) ([
 	// Create a list to store the EndNodeAutoConfig resources.
 	endNodeAutoConfigList := &v1alpha1.EndNodeAutoConfigList{}
 
+	fmt.Println("Namespace: ", namespace)
+
 	// Use the Kubernetes client to list all EndNodeAutoConfig resources in the specified namespace.
 	err := r.client.List(ctx, endNodeAutoConfigList, client.InNamespace(namespace))
 
@@ -103,8 +106,10 @@ func (r *CRRepository) ListByNamespace(ctx context.Context, namespace string) ([
 	var endNodeAutoConfigs []*v1alpha1.EndNodeAutoConfig
 	for _, item := range endNodeAutoConfigList.Items {
 		endNodeAutoConfigs = append(endNodeAutoConfigs, &item)
+		fmt.Println("HAHAHAHA")
 	}
 
+	fmt.Printf("INFO COUNTING: %d \n", len(endNodeAutoConfigs))
 	// Return the list of EndNodeAutoConfig resources and nil for the error.
 	return endNodeAutoConfigs, nil
 }
@@ -124,7 +129,7 @@ func (r *CRRepository) GetByDevice(ctx context.Context, device string, namespace
 	return endNodeAutoConfig, err
 }
 
-func (r *CRRepository) ListByDevice(ctx context.Context, device string, namespace string) ([]*v1alpha1.EndNodeAutoConfig, error) {
+func (r *CRRepository) ListByDevice(ctx context.Context, namespace, device string) ([]*v1alpha1.EndNodeAutoConfig, error) {
 	// fetch all configs in the namespace
 	listEndNodeAutoConfigInNamespace, err := r.ListByNamespace(ctx, namespace)
 
