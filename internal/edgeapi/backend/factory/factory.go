@@ -16,6 +16,7 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedeviceset"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevicesignedrequest"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgeworkload"
+	"github.com/project-flotta/flotta-operator/internal/common/repository/endnodeautoconfig"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/common/storage"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi"
@@ -80,8 +81,9 @@ func (f *Factory) createK8sBackend() backend.EdgeDeviceBackend {
 	edgeWorkloadRepository := edgeworkload.NewEdgeWorkloadRepository(f.Client)
 	edgeDeviceSetRepository := edgedeviceset.NewEdgeDeviceSetRepository(f.Client)
 	playbookExecutionRepository := playbookexecution.NewPlaybookExecutionRepository(f.Client)
+	endNodeAutoConfigRepository := endnodeautoconfig.NewEndNodeAutoConfigRepository(f.Client)
 	k8sRepository := k8s.NewRepository(edgeDeviceSignedRequestRepository, edgeDeviceRepository, edgeWorkloadRepository,
-		edgeDeviceSetRepository, playbookExecutionRepository, k8sClient)
+		edgeDeviceSetRepository, playbookExecutionRepository, endNodeAutoConfigRepository, k8sClient)
 
 	claimer := storage.NewClaimer(f.Client)
 	registryAuth := images.NewRegistryAuth(f.Client)

@@ -1,0 +1,6 @@
+apiVersion: management.project-flotta.io/v1alpha1
+kind: EndNodeConfig
+metadata:
+  name: endnodeconfig-sample
+spec:
+  # TODO(user): Add fields here

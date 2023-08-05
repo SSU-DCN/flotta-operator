@@ -12,6 +12,7 @@ import (
 
 //go:generate mockgen -package=edgeworkload -destination=mock_edgeworkload.go . Repository
 type Repository interface {
+	Create(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error
 	Read(ctx context.Context, name string, namespace string) (*v1alpha1.EdgeWorkload, error)
 	Patch(ctx context.Context, old, new *v1alpha1.EdgeWorkload) error
 	RemoveFinalizer(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload, finalizer string) error
@@ -66,4 +67,8 @@ func (r *CRRepository) ListByLabel(ctx context.Context, labelName, labelValue st
 		return nil, err
 	}
 	return edgeWorkloads.Items, nil
+}
+
+func (r *CRRepository) Create(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error {
+	return r.client.Create(ctx, edgeWorkload)
 }

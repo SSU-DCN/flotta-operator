@@ -1,0 +1,20 @@
+# permissions for end users to view endnodeconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: endnodeconfig-viewer-role
+rules:
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs/status
+  verbs:
+  - get

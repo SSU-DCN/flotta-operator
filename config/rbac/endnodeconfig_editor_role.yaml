@@ -1,0 +1,24 @@
+# permissions for end users to edit endnodeconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: endnodeconfig-editor-role
+rules:
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs/status
+  verbs:
+  - get

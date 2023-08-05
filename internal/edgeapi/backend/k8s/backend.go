@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
@@ -266,6 +267,11 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 				convertedDevice.State = HBwirelessDevice.State
 			}
 
+			//check if the end node data matches the autoconfig
+			hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice, HBwirelessDevice)
+			if !hasApplied {
+				b.logger.Error(err)
+			}
 			// Append the new instance to edgeDevice.Spec.WirelessDevices
 			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
 		}
@@ -324,4 +330,101 @@ func searchWirelessDevice(slice []*v1alpha1.WirelessDevices, targetName, targetI
 		}
 	}
 	return false // Target WirelessDevice not found in the slice
+}
+
+func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, device *v1alpha1.EdgeDevice, wirelessDevice *models.WirelessDevice) (bool, error) {
+	logger := b.logger.With("DeviceID", device.Name)
+
+	listEndNodeAutoConfig, err := b.repository.ListEndNodeAutoConfigByEdgeDevice(ctx, device.Namespace, device.Name)
+	if err != nil {
+		return false, err
+	}
+
+	if len(listEndNodeAutoConfig) > 0 {
+		return false, err
+	}
+
+	var endNodeAutoConfig *v1alpha1.EndNodeAutoConfig
+	// fetch all configs in the namespace
+	for _, item := range listEndNodeAutoConfig {
+		if item.Spec.Configuration.Connection == wirelessDevice.Connection && item.Spec.Configuration.Protocol == wirelessDevice.Protocol {
+			// Found the matching EndNodeAutoConfig resource, return it.
+			endNodeAutoConfig = item
+			break
+		}
+	}
+
+	deviceConfigPlugins := []v1.Container{}
+	for _, item := range endNodeAutoConfig.Spec.Configuration.DevicePlugin.Containers {
+		container := v1.Container{
+			Name:  item.Name,
+			Image: item.Image,
+		}
+		deviceConfigPlugins = append(deviceConfigPlugins, container)
+	}
+
+	edgeConfigsWorkloads := []v1.Container{}
+	for _, item := range endNodeAutoConfig.Spec.Configuration.WorkloadSpec.Containers {
+		container := v1.Container{
+			Name:  item.Name,
+			Image: item.Image,
+		}
+		edgeConfigsWorkloads = append(edgeConfigsWorkloads, container)
+	}
+
+	edgeWorkloadDevicePlugin := &v1alpha1.EdgeWorkload{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      generateUniqueName("end-node-device-plugin-", device.Name),
+			Namespace: device.Namespace,
+		},
+		Spec: v1alpha1.EdgeWorkloadSpec{
+			Device: device.Name,
+			Type:   v1alpha1.PodWorkloadType,
+			Pod: v1alpha1.Pod{
+				Spec: v1.PodSpec{
+					Containers: append([]v1.Container{}, deviceConfigPlugins...),
+				},
+			},
+		},
+	}
+
+	edgeWorkloadDeviceWorkloads := &v1alpha1.EdgeWorkload{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      generateUniqueName("end-node-device-workloads-", device.Name),
+			Namespace: device.Namespace,
+		},
+		Spec: v1alpha1.EdgeWorkloadSpec{
+			Device: device.Name,
+			Type:   v1alpha1.PodWorkloadType,
+			Pod: v1alpha1.Pod{
+				Spec: v1.PodSpec{
+					Containers: append([]v1.Container{}, edgeConfigsWorkloads...),
+				},
+			},
+		},
+	}
+
+	pluginCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDevicePlugin)
+	workloadCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDeviceWorkloads)
+	if pluginCreateError != nil || workloadCreateError != nil {
+		if pluginCreateError != nil {
+			logger.Errorf("Failed to create endNode Plugin ", pluginCreateError)
+			return false, pluginCreateError
+		}
+
+		if workloadCreateError != nil {
+			logger.Errorf("Failed to create endNode Workloads ", workloadCreateError)
+			return false, workloadCreateError
+		}
+	}
+
+	return true, nil
+}
+
+// generateUniqueName generates a unique name using a unique identifier.
+func generateUniqueName(name, device string) string {
+
+	return fmt.Sprintf("%s-%s-%d", name, device, time.Now().UnixNano())
 }

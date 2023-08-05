@@ -52,6 +52,20 @@ func (mr *MockRepositoryFacadeMockRecorder) CreateEdgeDeviceSignedRequest(arg0, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEdgeDeviceSignedRequest", reflect.TypeOf((*MockRepositoryFacade)(nil).CreateEdgeDeviceSignedRequest), arg0, arg1)
 }
 
+// CreateEdgeWorkload mocks base method.
+func (m *MockRepositoryFacade) CreateEdgeWorkload(arg0 context.Context, arg1 *v1alpha1.EdgeWorkload) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEdgeWorkload", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateEdgeWorkload indicates an expected call of CreateEdgeWorkload.
+func (mr *MockRepositoryFacadeMockRecorder) CreateEdgeWorkload(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEdgeWorkload", reflect.TypeOf((*MockRepositoryFacade)(nil).CreateEdgeWorkload), arg0, arg1)
+}
+
 // GetConfigMap mocks base method.
 func (m *MockRepositoryFacade) GetConfigMap(arg0 context.Context, arg1, arg2 string) (*v1.ConfigMap, error) {
 	m.ctrl.T.Helper()
@@ -127,6 +141,21 @@ func (mr *MockRepositoryFacadeMockRecorder) GetEdgeWorkload(arg0, arg1, arg2 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEdgeWorkload", reflect.TypeOf((*MockRepositoryFacade)(nil).GetEdgeWorkload), arg0, arg1, arg2)
 }
 
+// GetEndNodeAutoConfig mocks base method.
+func (m *MockRepositoryFacade) GetEndNodeAutoConfig(arg0 context.Context, arg1, arg2 string) (*v1alpha1.EndNodeAutoConfig, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEndNodeAutoConfig", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*v1alpha1.EndNodeAutoConfig)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEndNodeAutoConfig indicates an expected call of GetEndNodeAutoConfig.
+func (mr *MockRepositoryFacadeMockRecorder) GetEndNodeAutoConfig(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEndNodeAutoConfig", reflect.TypeOf((*MockRepositoryFacade)(nil).GetEndNodeAutoConfig), arg0, arg1, arg2)
+}
+
 // GetPlaybookExecution mocks base method.
 func (m *MockRepositoryFacade) GetPlaybookExecution(arg0 context.Context, arg1, arg2 string) (*v1alpha1.PlaybookExecution, error) {
 	m.ctrl.T.Helper()
@@ -157,6 +186,21 @@ func (mr *MockRepositoryFacadeMockRecorder) GetSecret(arg0, arg1, arg2 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockRepositoryFacade)(nil).GetSecret), arg0, arg1, arg2)
 }
 
+// ListEndNodeAutoConfigByEdgeDevice mocks base method.
+func (m *MockRepositoryFacade) ListEndNodeAutoConfigByEdgeDevice(arg0 context.Context, arg1, arg2 string) ([]*v1alpha1.EndNodeAutoConfig, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListEndNodeAutoConfigByEdgeDevice", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]*v1alpha1.EndNodeAutoConfig)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListEndNodeAutoConfigByEdgeDevice indicates an expected call of ListEndNodeAutoConfigByEdgeDevice.
+func (mr *MockRepositoryFacadeMockRecorder) ListEndNodeAutoConfigByEdgeDevice(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListEndNodeAutoConfigByEdgeDevice", reflect.TypeOf((*MockRepositoryFacade)(nil).ListEndNodeAutoConfigByEdgeDevice), arg0, arg1, arg2)
+}
+
 // PatchEdgeDevice mocks base method.
 func (m *MockRepositoryFacade) PatchEdgeDevice(arg0 context.Context, arg1, arg2 *v1alpha1.EdgeDevice) error {
 	m.ctrl.T.Helper()
@@ -183,6 +227,34 @@ func (m *MockRepositoryFacade) PatchEdgeDeviceStatus(arg0 context.Context, arg1 
 func (mr *MockRepositoryFacadeMockRecorder) PatchEdgeDeviceStatus(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchEdgeDeviceStatus", reflect.TypeOf((*MockRepositoryFacade)(nil).PatchEdgeDeviceStatus), arg0, arg1, arg2)
+}
+
+// PatchEndNodeAutoConfig mocks base method.
+func (m *MockRepositoryFacade) PatchEndNodeAutoConfig(arg0 context.Context, arg1, arg2 *v1alpha1.EndNodeAutoConfig) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PatchEndNodeAutoConfig", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PatchEndNodeAutoConfig indicates an expected call of PatchEndNodeAutoConfig.
+func (mr *MockRepositoryFacadeMockRecorder) PatchEndNodeAutoConfig(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchEndNodeAutoConfig", reflect.TypeOf((*MockRepositoryFacade)(nil).PatchEndNodeAutoConfig), arg0, arg1, arg2)
+}
+
+// PatchEndNodeAutoConfigStatus mocks base method.
+func (m *MockRepositoryFacade) PatchEndNodeAutoConfigStatus(arg0 context.Context, arg1 *v1alpha1.EndNodeAutoConfig, arg2 *client.Patch) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PatchEndNodeAutoConfigStatus", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PatchEndNodeAutoConfigStatus indicates an expected call of PatchEndNodeAutoConfigStatus.
+func (mr *MockRepositoryFacadeMockRecorder) PatchEndNodeAutoConfigStatus(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchEndNodeAutoConfigStatus", reflect.TypeOf((*MockRepositoryFacade)(nil).PatchEndNodeAutoConfigStatus), arg0, arg1, arg2)
 }
 
 // PatchPlaybookExecution mocks base method.

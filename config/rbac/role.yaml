@@ -131,6 +131,58 @@ rules:
 - apiGroups:
   - management.project-flotta.io
   resources:
+  - endnodeautoconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeautoconfigs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeautoconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - management.project-flotta.io
+  resources:
+  - endnodeconfigs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - management.project-flotta.io
+  resources:
   - playbookexecutions
   verbs:
   - create

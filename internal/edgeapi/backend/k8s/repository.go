@@ -11,6 +11,7 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedeviceset"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevicesignedrequest"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgeworkload"
+	"github.com/project-flotta/flotta-operator/internal/common/repository/endnodeautoconfig"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/k8sclient"
 )
@@ -22,6 +23,8 @@ type EdgeDeviceRepository interface {
 	PatchEdgeDevice(ctx context.Context, old, new *v1alpha1.EdgeDevice) error
 	GetPlaybookExecution(ctx context.Context, name string, namespace string) (*v1alpha1.PlaybookExecution, error)
 	PatchPlaybookExecution(ctx context.Context, old, new *v1alpha1.PlaybookExecution) error
+	ListEndNodeAutoConfigByEdgeDevice(ctx context.Context, namespace, device string) ([]*v1alpha1.EndNodeAutoConfig, error)
+	CreateEdgeWorkload(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error
 }
 
 type EdgeDeviceSignedRequestRepository interface {
@@ -47,6 +50,12 @@ type CoreRepository interface {
 	GetConfigMap(ctx context.Context, name string, namespace string) (*v1.ConfigMap, error)
 }
 
+type EndNodeAutoConfigRepository interface {
+	GetEndNodeAutoConfig(ctx context.Context, name, namespace string) (*v1alpha1.EndNodeAutoConfig, error)
+	PatchEndNodeAutoConfigStatus(ctx context.Context, endNodeAutoConfig *v1alpha1.EndNodeAutoConfig, patch *client.Patch) error
+	PatchEndNodeAutoConfig(ctx context.Context, old, new *v1alpha1.EndNodeAutoConfig) error
+}
+
 //go:generate mockgen -package=k8s -destination=mock_repository_facade.go . RepositoryFacade
 type RepositoryFacade interface {
 	EdgeDeviceRepository
@@ -55,6 +64,7 @@ type RepositoryFacade interface {
 	EdgeDeviceSetRepository
 	PlaybookExecutionRepository
 	CoreRepository
+	EndNodeAutoConfigRepository
 }
 type repositoryFacade struct {
 	deviceSignedRequestRepository edgedevicesignedrequest.Repository
@@ -62,6 +72,7 @@ type repositoryFacade struct {
 	workloadRepository            edgeworkload.Repository
 	deviceSetRepository           edgedeviceset.Repository
 	playbookExecutionRepository   playbookexecution.Repository
+	endNodeAutoConfigRepository   endnodeautoconfig.Repository
 
 	client k8sclient.K8sClient
 }
@@ -71,13 +82,15 @@ func NewRepository(deviceSignedRequestRepository edgedevicesignedrequest.Reposit
 	workloadRepository edgeworkload.Repository,
 	deviceSetRepository edgedeviceset.Repository,
 	playbookExecutionRepository playbookexecution.Repository,
+	endNodeAutoConfigRepository endnodeautoconfig.Repository,
 	client k8sclient.K8sClient) RepositoryFacade {
 	return &repositoryFacade{
 		deviceSignedRequestRepository: deviceSignedRequestRepository,
 		deviceRepository:              deviceRepository,
-		deviceSetRepository:           deviceSetRepository,
 		workloadRepository:            workloadRepository,
+		deviceSetRepository:           deviceSetRepository,
 		playbookExecutionRepository:   playbookExecutionRepository,
+		endNodeAutoConfigRepository:   endNodeAutoConfigRepository,
 		client:                        client,
 	}
 }
@@ -138,4 +151,32 @@ func (b *repositoryFacade) GetConfigMap(ctx context.Context, name string, namesp
 		return nil, err
 	}
 	return &configMap, nil
+}
+
+//NEW CODE
+// GetEndNodeAutoConfig implements RepositoryFacade.
+func (b *repositoryFacade) GetEndNodeAutoConfig(ctx context.Context, name string, namespace string) (*v1alpha1.EndNodeAutoConfig, error) {
+	return b.endNodeAutoConfigRepository.Read(ctx, name, namespace)
+}
+
+// PatchEndNodeAutoConfig implements RepositoryFacade.
+func (b *repositoryFacade) PatchEndNodeAutoConfig(ctx context.Context, old *v1alpha1.EndNodeAutoConfig, new *v1alpha1.EndNodeAutoConfig) error {
+	return b.endNodeAutoConfigRepository.Patch(ctx, old, new)
+}
+
+// PatchEndNodeAutoConfigStatus implements RepositoryFacade.
+func (b *repositoryFacade) PatchEndNodeAutoConfigStatus(ctx context.Context, endNodeAutoConfig *v1alpha1.EndNodeAutoConfig, patch *client.Patch) error {
+	return b.endNodeAutoConfigRepository.PatchStatus(ctx, endNodeAutoConfig, patch)
+}
+
+// func (b *repositoryFacade) ListForSelectorEndNodeAutoConfig(ctx context.Context, selector *metav1.LabelSelector, namespace string) ([]v1alpha1.EndNodeAutoConfig, error) {
+// 	return b.endNodeAutoConfigRepository.ListForSelector(ctx, selector, namespace)
+// }
+
+func (b *repositoryFacade) ListEndNodeAutoConfigByEdgeDevice(ctx context.Context, namespace, device string) ([]*v1alpha1.EndNodeAutoConfig, error) {
+	return b.endNodeAutoConfigRepository.ListByDevice(ctx, namespace, device)
+}
+
+func (b *repositoryFacade) CreateEdgeWorkload(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error {
+	return b.workloadRepository.Create(ctx, edgeWorkload)
 }
