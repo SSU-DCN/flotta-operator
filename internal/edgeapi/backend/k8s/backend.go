@@ -238,15 +238,19 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 	}
 
 	oldEdgeDevice := edgeDevice.DeepCopy()
-	SpecRegisteredDevices := oldEdgeDevice.Spec.WirelessDevices
-	StatusRegisteredDevices := oldEdgeDevice.Status.WirelessDevices
+	specWirelessDevices := oldEdgeDevice.Spec.WirelessDevices
+	statusWirelessDevices := oldEdgeDevice.Status.WirelessDevices
 	patch := client.MergeFrom(oldEdgeDevice)
 
-	// matchedDevice := false
-	for _, HBwirelessDevice := range wirelessDevices {
-		// Check if the wireless device has a matching registered device
-		matchedDevice := searchWirelessDevice(SpecRegisteredDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
+	var wirelessDevicesSpec []*v1alpha1.WirelessDevices = specWirelessDevices
+	appliedWorkloadsPlugin := false // Move this outside the for loop
 
+	for _, HBwirelessDevice := range wirelessDevices {
+
+		b.logger.Info(HBwirelessDevice)
+
+		// Check if the wireless device has a matching registered device in the spec
+		matchedDevice := searchWirelessDevice(specWirelessDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
 		if !matchedDevice {
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
 			convertedDevice := &v1alpha1.WirelessDevices{
@@ -258,27 +262,26 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 				Protocol:     HBwirelessDevice.Protocol,
 				Connection:   HBwirelessDevice.Connection,
 				DeviceType:   HBwirelessDevice.DeviceType,
+				// LastSeen:     HBwirelessDevice.LastSeen,
 			}
-
-			// Set specific fields based on the device type
-			if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
-				convertedDevice.Readings = HBwirelessDevice.Readings
-			} else {
+			if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
 				convertedDevice.State = HBwirelessDevice.State
 			}
-
-			// Append the new instance to edgeDevice.Spec.WirelessDevices
-			edgeDevice.Spec.WirelessDevices = append(edgeDevice.Spec.WirelessDevices, convertedDevice)
+			wirelessDevicesSpec = append(wirelessDevicesSpec, convertedDevice)
 
 			//check if the end node data matches the autoconfig
-			hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice, HBwirelessDevice)
-			if !hasApplied {
-				b.logger.Error("An error occurred apply for EndNodeAutoConfig: %s", err.Error())
+			if !appliedWorkloadsPlugin {
+				hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice.Namespace, edgeDevice.Name, HBwirelessDevice)
+				if !hasApplied {
+					b.logger.Error("An error occurred while applying for EndNodeAutoConfig: %s", err.Error())
+				} else {
+					appliedWorkloadsPlugin = true
+				}
 			}
 		}
 
-		//for the status
-		matchedDeviceStatus := searchWirelessDevice(StatusRegisteredDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
+		// Check if the wireless device has a matching registered device in the status
+		matchedDeviceStatus := searchWirelessDevice(statusWirelessDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
 
 		if !matchedDeviceStatus {
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
@@ -290,65 +293,81 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 				Identifiers:  HBwirelessDevice.Identifiers,
 				Protocol:     HBwirelessDevice.Protocol,
 				Connection:   HBwirelessDevice.Connection,
-				Battery:      HBwirelessDevice.Battery,
 				DeviceType:   HBwirelessDevice.DeviceType,
-				Availability: HBwirelessDevice.Availability,
 				LastSeen:     HBwirelessDevice.LastSeen,
 			}
-
-			// Set specific fields based on the device type
-			if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
-				convertedDevice.Readings = HBwirelessDevice.Readings
-			} else {
+			if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
 				convertedDevice.State = HBwirelessDevice.State
+			} else {
+				convertedDevice.Readings = HBwirelessDevice.Readings
+			}
+			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
+		} else {
+
+			b.logger.Info("Update the status")
+			// The wireless device already exists in the status, update it
+			for _, device := range edgeDevice.Status.WirelessDevices {
+				if device.Identifiers == HBwirelessDevice.Identifiers {
+					// Update the existing device with the new values
+					device.Name = HBwirelessDevice.Name
+					device.Manufacturer = HBwirelessDevice.Manufacturer
+					device.Model = HBwirelessDevice.Model
+					device.SWVersion = HBwirelessDevice.SwVersion
+					device.Protocol = HBwirelessDevice.Protocol
+					device.Connection = HBwirelessDevice.Connection
+					device.Battery = HBwirelessDevice.Battery
+					device.DeviceType = HBwirelessDevice.DeviceType
+					device.Availability = HBwirelessDevice.Availability
+					device.LastSeen = HBwirelessDevice.LastSeen
+
+					if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+						device.Readings = HBwirelessDevice.Readings
+					} else {
+						device.State = HBwirelessDevice.State
+					}
+				}
 			}
 
-			// Append the new instance to edgeDevice.Spec.WirelessDevices
-			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
 		}
-
 	}
-
-	edgeDeviceUP := edgeDevice.DeepCopy()
-
-	if patch == nil {
-		fmt.Println("")
-	}
-	if edgeDeviceUP == nil {
-		fmt.Println("")
-	}
-
-	fmt.Println("Updated Check")
 
 	// Patch the edgeDevice with the updated or added devices
-	// if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
-	// 	return false, fmt.Errorf("failed to patch edge device status: %w", err)
-	// }
+	if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
+		return false, fmt.Errorf("failed to patch edge device status: %w", err)
+	}
 
-	// // Patch the edgeDevice with the updated or added devices
-	// if err := b.repository.PatchEdgeDevice(ctx, edgeDevice, edgeDeviceUP); err != nil {
-	// 	return false, fmt.Errorf("failed to patch edge device: %w", err)
-	// }
+	edgeDevice2, err := b.repository.GetEdgeDevice(ctx, name, namespace)
+	if err != nil {
+		return false, fmt.Errorf("failed to get edge device: %w", err)
+	}
+	edgeDeviceCopy := edgeDevice2.DeepCopy()
+	edgeDeviceCopy.Spec.WirelessDevices = wirelessDevicesSpec
+	// No need to use edgeDevice.DeepCopy() again, as we already have the changes in edgeDevice
+	if err := b.repository.PatchEdgeDevice(ctx, edgeDevice2, edgeDeviceCopy); err != nil {
+		return false, fmt.Errorf("failed to patch edge device: %w", err)
+	}
 
 	return true, nil
 }
 
+// Other functions are unchanged from the previous version.
+
 func searchWirelessDevice(slice []*v1alpha1.WirelessDevices, targetName, targetIdentifiers string) bool {
 	for _, device := range slice {
-		if device.Name == targetName && device.Identifiers == targetIdentifiers {
+		if device.Identifiers == targetIdentifiers {
 			return true // Found the target WirelessDevice in the slice
 		}
 	}
 	return false // Target WirelessDevice not found in the slice
 }
 
-func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, device *v1alpha1.EdgeDevice, wirelessDevice *models.WirelessDevice) (bool, error) {
+func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, namespace string, device_name string, wirelessDevice *models.WirelessDevice) (bool, error) {
 
 	b.logger.Infof("WE ARE IN THE FUNCTION")
 
 	// logger := b.logger.With("DeviceID", device.Name)
 
-	listEndNodeAutoConfig, err := b.repository.ListEndNodeAutoConfigByEdgeDevice(ctx, device.Namespace, device.Name)
+	listEndNodeAutoConfig, err := b.repository.ListEndNodeAutoConfigByEdgeDevice(ctx, namespace, device_name)
 	if err != nil {
 		return false, err
 	}
@@ -402,11 +421,11 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, devic
 	edgeWorkloadDevicePlugin := &v1alpha1.EdgeWorkload{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      generateUniqueName("end-node-device-plugin-", device.Name),
-			Namespace: device.Namespace,
+			Name:      generateUniqueName("plugin", device_name),
+			Namespace: namespace,
 		},
 		Spec: v1alpha1.EdgeWorkloadSpec{
-			Device: device.Name,
+			Device: device_name,
 			Type:   v1alpha1.PodWorkloadType,
 			Pod: v1alpha1.Pod{
 				Spec: v1.PodSpec{
@@ -419,11 +438,11 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, devic
 	edgeWorkloadDeviceWorkloads := &v1alpha1.EdgeWorkload{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      generateUniqueName("end-node-device-workloads-", device.Name),
-			Namespace: device.Namespace,
+			Name:      generateUniqueName("workloads", device_name),
+			Namespace: namespace,
 		},
 		Spec: v1alpha1.EdgeWorkloadSpec{
-			Device: device.Name,
+			Device: device_name,
 			Type:   v1alpha1.PodWorkloadType,
 			Pod: v1alpha1.Pod{
 				Spec: v1.PodSpec{
