@@ -451,7 +451,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 
 	// Patch the edgeDevice with the updated or added devices
 	if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
-		return false, fmt.Errorf("failed to patch edge device status: %w", err)
+		return false, fmt.Errorf("failed to patch edge device status : %w", err)
 	}
 
 	edgeDevice2, err := b.repository.GetEdgeDevice(ctx, name, namespace)
