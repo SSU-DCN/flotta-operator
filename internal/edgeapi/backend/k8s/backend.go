@@ -252,21 +252,60 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 		// Check if the wireless device has a matching registered device in the spec
 		matchedDevice := searchWirelessDevice(specWirelessDevices, HBwirelessDevice.Name, HBwirelessDevice.Identifiers)
 		if !matchedDevice {
+
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
 			convertedDevice := &v1alpha1.WirelessDevices{
-				Name:         HBwirelessDevice.Name,
-				Manufacturer: HBwirelessDevice.Manufacturer,
-				Model:        HBwirelessDevice.Model,
-				SWVersion:    HBwirelessDevice.SwVersion,
-				Identifiers:  HBwirelessDevice.Identifiers,
-				Protocol:     HBwirelessDevice.Protocol,
-				Connection:   HBwirelessDevice.Connection,
-				DeviceType:   HBwirelessDevice.DeviceType,
+				Name:        HBwirelessDevice.Name,
+				Identifiers: HBwirelessDevice.Identifiers,
+				Protocol:    HBwirelessDevice.Protocol,
+				Connection:  HBwirelessDevice.Connection,
 				// LastSeen:     HBwirelessDevice.LastSeen,
 			}
-			if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
-				convertedDevice.State = HBwirelessDevice.State
+
+			//check if the values are available in the struct
+			if HBwirelessDevice.Availability != "" {
+				convertedDevice.Availability = HBwirelessDevice.Availability
 			}
+
+			if HBwirelessDevice.Manufacturer != "" {
+				convertedDevice.Manufacturer = HBwirelessDevice.Manufacturer
+			}
+
+			if HBwirelessDevice.Model != "" {
+				convertedDevice.Model = HBwirelessDevice.Model
+			}
+
+			if HBwirelessDevice.SwVersion != "" {
+				convertedDevice.SWVersion = HBwirelessDevice.SwVersion
+			}
+			if HBwirelessDevice.DeviceType != "" {
+				convertedDevice.SWVersion = HBwirelessDevice.DeviceType
+				if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
+					convertedDevice.State = HBwirelessDevice.State
+				}
+			}
+
+			if strings.ToLower(HBwirelessDevice.Connection) == "ble" {
+				var ble_characteristics []*v1alpha1.BleCharacteristic
+				for _, hbBleCharacteristic := range HBwirelessDevice.BleCharacteristics {
+					bleCharacteristic := &v1alpha1.BleCharacteristic{
+						Name:               hbBleCharacteristic.Name,
+						CharacteristicUUID: hbBleCharacteristic.CharacteristicUUID,
+						ServiceUUID:        hbBleCharacteristic.ServiceUUID,
+						AccessMode:         hbBleCharacteristic.AccessMode,
+						Value:              hbBleCharacteristic.Value,
+					}
+
+					if hbBleCharacteristic.Unit != "" {
+						bleCharacteristic.Unit = hbBleCharacteristic.Unit
+					}
+
+					ble_characteristics = append(ble_characteristics, bleCharacteristic)
+				}
+				convertedDevice.BleCharacteristics = ble_characteristics
+
+			}
+
 			wirelessDevicesSpec = append(wirelessDevicesSpec, convertedDevice)
 
 			//check if the end node data matches the autoconfig
@@ -286,45 +325,124 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 		if !matchedDeviceStatus {
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
 			convertedDevice := &v1alpha1.WirelessDevices{
-				Name:         HBwirelessDevice.Name,
-				Manufacturer: HBwirelessDevice.Manufacturer,
-				Model:        HBwirelessDevice.Model,
-				SWVersion:    HBwirelessDevice.SwVersion,
-				Identifiers:  HBwirelessDevice.Identifiers,
-				Protocol:     HBwirelessDevice.Protocol,
-				Connection:   HBwirelessDevice.Connection,
-				DeviceType:   HBwirelessDevice.DeviceType,
-				LastSeen:     HBwirelessDevice.LastSeen,
+				Name:        HBwirelessDevice.Name,
+				Identifiers: HBwirelessDevice.Identifiers,
+				Protocol:    HBwirelessDevice.Protocol,
+				Connection:  HBwirelessDevice.Connection,
+				LastSeen:    HBwirelessDevice.LastSeen,
 			}
-			if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
-				convertedDevice.State = HBwirelessDevice.State
-			} else {
-				convertedDevice.Readings = HBwirelessDevice.Readings
+
+			//check if the values are available in the struct
+			if HBwirelessDevice.Availability != "" {
+				convertedDevice.Availability = HBwirelessDevice.Availability
 			}
+
+			if HBwirelessDevice.Manufacturer != "" {
+				convertedDevice.Manufacturer = HBwirelessDevice.Manufacturer
+			}
+
+			if HBwirelessDevice.Model != "" {
+				convertedDevice.Model = HBwirelessDevice.Model
+			}
+
+			if HBwirelessDevice.SwVersion != "" {
+				convertedDevice.SWVersion = HBwirelessDevice.SwVersion
+			}
+			if HBwirelessDevice.DeviceType != "" {
+				convertedDevice.SWVersion = HBwirelessDevice.DeviceType
+				if strings.ToLower(HBwirelessDevice.DeviceType) != "sensor" {
+					convertedDevice.State = HBwirelessDevice.State
+				} else {
+					convertedDevice.Readings = HBwirelessDevice.Readings
+				}
+			}
+
+			if strings.ToLower(HBwirelessDevice.Connection) == "ble" {
+				var ble_characteristics []*v1alpha1.BleCharacteristic
+				for _, hbBleCharacteristic := range HBwirelessDevice.BleCharacteristics {
+					bleCharacteristic := &v1alpha1.BleCharacteristic{
+						Name:               hbBleCharacteristic.Name,
+						CharacteristicUUID: hbBleCharacteristic.CharacteristicUUID,
+						ServiceUUID:        hbBleCharacteristic.ServiceUUID,
+						AccessMode:         hbBleCharacteristic.AccessMode,
+						Value:              hbBleCharacteristic.Value,
+					}
+
+					if hbBleCharacteristic.Unit != "" {
+						bleCharacteristic.Unit = hbBleCharacteristic.Unit
+					}
+
+					ble_characteristics = append(ble_characteristics, bleCharacteristic)
+				}
+				convertedDevice.BleCharacteristics = ble_characteristics
+
+			}
+
 			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
 		} else {
 
 			b.logger.Info("Update the status")
 			// The wireless device already exists in the status, update it
+
 			for _, device := range edgeDevice.Status.WirelessDevices {
 				if device.Identifiers == HBwirelessDevice.Identifiers {
 					// Update the existing device with the new values
 					device.Name = HBwirelessDevice.Name
-					device.Manufacturer = HBwirelessDevice.Manufacturer
-					device.Model = HBwirelessDevice.Model
-					device.SWVersion = HBwirelessDevice.SwVersion
 					device.Protocol = HBwirelessDevice.Protocol
 					device.Connection = HBwirelessDevice.Connection
-					device.Battery = HBwirelessDevice.Battery
-					device.DeviceType = HBwirelessDevice.DeviceType
-					device.Availability = HBwirelessDevice.Availability
 					device.LastSeen = HBwirelessDevice.LastSeen
 
-					if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
-						device.Readings = HBwirelessDevice.Readings
-					} else {
-						device.State = HBwirelessDevice.State
+					if device.Manufacturer != "" {
+						device.Manufacturer = HBwirelessDevice.Availability
 					}
+
+					if device.SWVersion != "" {
+						device.SWVersion = HBwirelessDevice.SwVersion
+					}
+
+					if device.Model != "" {
+						device.Model = HBwirelessDevice.Model
+					}
+
+					if device.Battery != "" {
+						device.Battery = HBwirelessDevice.Battery
+					}
+
+					if device.DeviceType != "" {
+						device.DeviceType = HBwirelessDevice.DeviceType
+						if strings.ToLower(HBwirelessDevice.DeviceType) == "sensor" {
+							device.Readings = HBwirelessDevice.Readings
+						} else {
+							device.State = HBwirelessDevice.State
+						}
+					}
+
+					if device.Availability != "" {
+						device.Availability = HBwirelessDevice.Availability
+					}
+
+					if strings.ToLower(device.Connection) == "ble" {
+						var ble_characteristics []*v1alpha1.BleCharacteristic
+						for _, hbBleCharacteristic := range HBwirelessDevice.BleCharacteristics {
+							bleCharacteristic := &v1alpha1.BleCharacteristic{
+								Name:               hbBleCharacteristic.Name,
+								CharacteristicUUID: hbBleCharacteristic.CharacteristicUUID,
+								ServiceUUID:        hbBleCharacteristic.ServiceUUID,
+								AccessMode:         hbBleCharacteristic.AccessMode,
+								Value:              hbBleCharacteristic.Value,
+							}
+
+							if hbBleCharacteristic.Unit != "" {
+								bleCharacteristic.Unit = hbBleCharacteristic.Unit
+							}
+
+							ble_characteristics = append(ble_characteristics, bleCharacteristic)
+						}
+
+						device.BleCharacteristics = ble_characteristics
+
+					}
+
 				}
 			}
 

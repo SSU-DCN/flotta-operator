@@ -447,6 +447,31 @@ type WirelessDevices struct {
 	Readings     string `json:"readings,omitempty"`
 	State        string `json:"state,omitempty"`
 	LastSeen     string `json:"lastSeen,omitempty"`
+
+	// ble characteristics
+	BleCharacteristics []*BleCharacteristic `json:"ble_characteristics,omitempty"`
+}
+
+// wireless property
+type BleCharacteristic struct {
+
+	// Access mode of characteristic, ReadWrite or ReadOnly
+	AccessMode string `json:"access_mode,omitempty"`
+
+	// unique identifier of characteristic
+	CharacteristicUUID string `json:"characteristic_uuid,omitempty"`
+
+	// Friendly name of the BLE characteristic.
+	Name string `json:"name,omitempty"`
+
+	// parent service uuid.
+	ServiceUUID string `json:"service_uuid,omitempty"`
+
+	// The unit of of characteristic.
+	Unit string `json:"unit,omitempty"`
+
+	// value transferred on this characteristic
+	Value string `json:"value,omitempty"`
 }
 
 //+kubebuilder:object:root=true

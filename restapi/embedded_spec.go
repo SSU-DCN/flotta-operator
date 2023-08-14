@@ -225,6 +225,35 @@ func init() {
         }
       }
     },
+    "ble_characteristic": {
+      "type": "object",
+      "properties": {
+        "access_mode": {
+          "description": "Access mode of characteristic, ReadWrite or ReadOnly",
+          "type": "string"
+        },
+        "characteristic_uuid": {
+          "description": "unique identifier of characteristic",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the BLE characteristic.",
+          "type": "string"
+        },
+        "service_uuid": {
+          "description": "parent service uuid.",
+          "type": "string"
+        },
+        "unit": {
+          "description": "The unit of of characteristic.",
+          "type": "string"
+        },
+        "value": {
+          "description": "value transferred on this characteristic",
+          "type": "string"
+        }
+      }
+    },
     "boot": {
       "type": "object",
       "properties": {
@@ -1130,6 +1159,12 @@ func init() {
           "description": "Battery percentage of the end device; otherwise null",
           "type": "string"
         },
+        "ble_characteristics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ble_characteristic"
+          }
+        },
         "connection": {
           "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
           "type": "string"
@@ -1496,6 +1531,35 @@ func init() {
       "properties": {
         "period_seconds": {
           "type": "integer"
+        }
+      }
+    },
+    "ble_characteristic": {
+      "type": "object",
+      "properties": {
+        "access_mode": {
+          "description": "Access mode of characteristic, ReadWrite or ReadOnly",
+          "type": "string"
+        },
+        "characteristic_uuid": {
+          "description": "unique identifier of characteristic",
+          "type": "string"
+        },
+        "name": {
+          "description": "Friendly name of the BLE characteristic.",
+          "type": "string"
+        },
+        "service_uuid": {
+          "description": "parent service uuid.",
+          "type": "string"
+        },
+        "unit": {
+          "description": "The unit of of characteristic.",
+          "type": "string"
+        },
+        "value": {
+          "description": "value transferred on this characteristic",
+          "type": "string"
         }
       }
     },
@@ -2404,6 +2468,12 @@ func init() {
         "battery": {
           "description": "Battery percentage of the end device; otherwise null",
           "type": "string"
+        },
+        "ble_characteristics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ble_characteristic"
+          }
         },
         "connection": {
           "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",

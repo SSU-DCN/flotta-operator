@@ -7,7 +7,9 @@ package models
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -22,6 +24,9 @@ type WirelessDevice struct {
 
 	// Battery percentage of the end device; otherwise null
 	Battery string `json:"battery,omitempty"`
+
+	// ble characteristics
+	BleCharacteristics []*BleCharacteristic `json:"ble_characteristics"`
 
 	// Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.
 	Connection string `json:"connection,omitempty"`
@@ -59,11 +64,75 @@ type WirelessDevice struct {
 
 // Validate validates this wireless device
 func (m *WirelessDevice) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateBleCharacteristics(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this wireless device based on context it is used
+func (m *WirelessDevice) validateBleCharacteristics(formats strfmt.Registry) error {
+	if swag.IsZero(m.BleCharacteristics) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.BleCharacteristics); i++ {
+		if swag.IsZero(m.BleCharacteristics[i]) { // not required
+			continue
+		}
+
+		if m.BleCharacteristics[i] != nil {
+			if err := m.BleCharacteristics[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this wireless device based on the context it is used
 func (m *WirelessDevice) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBleCharacteristics(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *WirelessDevice) contextValidateBleCharacteristics(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.BleCharacteristics); i++ {
+
+		if m.BleCharacteristics[i] != nil {
+			if err := m.BleCharacteristics[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
