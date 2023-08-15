@@ -837,67 +837,73 @@ definitions:
   wireless_device:
     type: object
     properties:
-      name:
+      wireless_device_name:
         description: Friendly name of the device. 
         type: string
-      manufacturer:
+      wireless_device_manufacturer:
         description: Device Manufacturer of the end node
         type: string
-      model:
+      wireless_device_model:
         description: Model number/string of the end node device
         type: string
-      sw_version:
+      wireless_device_sw_version:
         description: Software version of the end node device
         type: string
-      identifiers:
+      wireless_device_identifier:
         description: unique identifier for device e.g. Serial number
         type: string
-      protocol:
+      wireless_device_protocol:
         description: Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
         type: string
-      connection:
+      wireless_device_connection:
         description: Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.
         type: string
-      battery:
+      wireless_device_battery:
         description: Battery percentage of the end device; otherwise null
         type: string
-      availability:
+      wireless_device_availability:
         description: Online status of the end device; Online/offline
         type: string
-      device_type:
-        description: Whether the device is a sensor or actuator
-        type: string
-      readings:
+     
+      wireless_device_description:
         description: if end node device is a sensor, JSON format data will be here otherwise will be null
         type: string
-      state:
-        description: This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE
-        type: string
-      last_seen:
+      
+      wireless_device_last_seen:
         description: The last time the end node transacted
         type: string
-      ble_characteristics:
+      device_properties:
         type: array
         items:
-          $ref: '#/definitions/ble_characteristic'
-  ble_characteristic:
+          $ref: '#/definitions/device_property'
+  device_property:
     type: object
     properties:
-      name:
+      property_identifier:
+        description: unique identifier of the property
+        type: string
+      property_name:
         description: Friendly name of the BLE characteristic. 
         type: string
-      service_uuid:
-        description: parent service uuid. 
+      property_service_uuid:
+        description: property service uuid. 
         type: string
-      characteristic_uuid:
-        description: unique identifier of characteristic 
+      
+      property_access_mode:
+        description: access mode of the property, Read or ReadWrite 
         type: string
-      value:
-        description: value transferred on this characteristic 
+      property_reading:
+        description: value of property supporting Read only 
         type: string
-      access_mode:
-        description: Access mode of characteristic, ReadWrite or ReadOnly
+      property_state:
+        description: value of property allowing ReadWrite
         type: string
-      unit:
-        description: The unit of of characteristic.
+      property_unit:
+        description: Unit of the property
+        type: string
+      property_description:
+        description: Description of the property
+        type: string
+      property_last_seen:
+        description: Last activity of the property
         type: string

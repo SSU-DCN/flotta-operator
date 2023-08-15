@@ -215,6 +215,32 @@ spec:
                       type: string
                     battery:
                       type: string
+                    ble_characteristics:
+                      description: ble characteristics
+                      items:
+                        description: wireless property
+                        properties:
+                          access_mode:
+                            description: Access mode of characteristic, ReadWrite
+                              or ReadOnly
+                            type: string
+                          characteristic_uuid:
+                            description: unique identifier of characteristic
+                            type: string
+                          name:
+                            description: Friendly name of the BLE characteristic.
+                            type: string
+                          service_uuid:
+                            description: parent service uuid.
+                            type: string
+                          unit:
+                            description: The unit of of characteristic.
+                            type: string
+                          value:
+                            description: value transferred on this characteristic
+                            type: string
+                        type: object
+                      type: array
                     connection:
                       type: string
                     deviceType:
@@ -572,6 +598,32 @@ spec:
                       type: string
                     battery:
                       type: string
+                    ble_characteristics:
+                      description: ble characteristics
+                      items:
+                        description: wireless property
+                        properties:
+                          access_mode:
+                            description: Access mode of characteristic, ReadWrite
+                              or ReadOnly
+                            type: string
+                          characteristic_uuid:
+                            description: unique identifier of characteristic
+                            type: string
+                          name:
+                            description: Friendly name of the BLE characteristic.
+                            type: string
+                          service_uuid:
+                            description: parent service uuid.
+                            type: string
+                          unit:
+                            description: The unit of of characteristic.
+                            type: string
+                          value:
+                            description: value transferred on this characteristic
+                            type: string
+                        type: object
+                      type: array
                     connection:
                       type: string
                     deviceType:

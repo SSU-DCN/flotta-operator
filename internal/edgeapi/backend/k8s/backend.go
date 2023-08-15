@@ -3,11 +3,9 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"go.uber.org/zap"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
@@ -231,6 +229,7 @@ func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeD
 
 //NEW CODE
 // ManageWirelessDevices implements backend.EdgeDeviceBackend.
+/*
 func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
 	edgeDevice, err := b.repository.GetEdgeDevice(ctx, name, namespace)
 	if err != nil {
@@ -467,9 +466,9 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 
 	return true, nil
 }
-
+*/
 // Other functions are unchanged from the previous version.
-
+/*
 func searchWirelessDevice(slice []*v1alpha1.WirelessDevices, targetName, targetIdentifiers string) bool {
 	for _, device := range slice {
 		if device.Identifiers == targetIdentifiers {
@@ -592,3 +591,4 @@ func generateUniqueName(name, device string) string {
 
 	return fmt.Sprintf("%s-%s-%d", name, device, time.Now().UnixNano())
 }
+*/

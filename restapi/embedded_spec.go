@@ -225,35 +225,6 @@ func init() {
         }
       }
     },
-    "ble_characteristic": {
-      "type": "object",
-      "properties": {
-        "access_mode": {
-          "description": "Access mode of characteristic, ReadWrite or ReadOnly",
-          "type": "string"
-        },
-        "characteristic_uuid": {
-          "description": "unique identifier of characteristic",
-          "type": "string"
-        },
-        "name": {
-          "description": "Friendly name of the BLE characteristic.",
-          "type": "string"
-        },
-        "service_uuid": {
-          "description": "parent service uuid.",
-          "type": "string"
-        },
-        "unit": {
-          "description": "The unit of of characteristic.",
-          "type": "string"
-        },
-        "value": {
-          "description": "value transferred on this characteristic",
-          "type": "string"
-        }
-      }
-    },
     "boot": {
       "type": "object",
       "properties": {
@@ -425,6 +396,47 @@ func init() {
           "description": "Defines the interval in seconds between the attempts to evaluate the workloads status and restart those that failed",
           "type": "integer",
           "exclusiveMinimum": true
+        }
+      }
+    },
+    "device_property": {
+      "type": "object",
+      "properties": {
+        "property_access_mode": {
+          "description": "access mode of the property, Read or ReadWrite",
+          "type": "string"
+        },
+        "property_description": {
+          "description": "Description of the property",
+          "type": "string"
+        },
+        "property_identifier": {
+          "description": "unique identifier of the property",
+          "type": "string"
+        },
+        "property_last_seen": {
+          "description": "Last activity of the property",
+          "type": "string"
+        },
+        "property_name": {
+          "description": "Friendly name of the BLE characteristic.",
+          "type": "string"
+        },
+        "property_reading": {
+          "description": "value of property supporting Read only",
+          "type": "string"
+        },
+        "property_service_uuid": {
+          "description": "property service uuid.",
+          "type": "string"
+        },
+        "property_state": {
+          "description": "value of property allowing ReadWrite",
+          "type": "string"
+        },
+        "property_unit": {
+          "description": "Unit of the property",
+          "type": "string"
         }
       }
     },
@@ -1151,61 +1163,53 @@ func init() {
     "wireless_device": {
       "type": "object",
       "properties": {
-        "availability": {
+        "device_properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/device_property"
+          }
+        },
+        "wireless_device_availability": {
           "description": "Online status of the end device; Online/offline",
           "type": "string"
         },
-        "battery": {
+        "wireless_device_battery": {
           "description": "Battery percentage of the end device; otherwise null",
           "type": "string"
         },
-        "ble_characteristics": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ble_characteristic"
-          }
-        },
-        "connection": {
+        "wireless_device_connection": {
           "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
           "type": "string"
         },
-        "device_type": {
-          "description": "Whether the device is a sensor or actuator",
-          "type": "string"
-        },
-        "identifiers": {
-          "description": "unique identifier for device e.g. Serial number",
-          "type": "string"
-        },
-        "last_seen": {
-          "description": "The last time the end node transacted",
-          "type": "string"
-        },
-        "manufacturer": {
-          "description": "Device Manufacturer of the end node",
-          "type": "string"
-        },
-        "model": {
-          "description": "Model number/string of the end node device",
-          "type": "string"
-        },
-        "name": {
-          "description": "Friendly name of the device.",
-          "type": "string"
-        },
-        "protocol": {
-          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
-          "type": "string"
-        },
-        "readings": {
+        "wireless_device_description": {
           "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
           "type": "string"
         },
-        "state": {
-          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+        "wireless_device_identifier": {
+          "description": "unique identifier for device e.g. Serial number",
           "type": "string"
         },
-        "sw_version": {
+        "wireless_device_last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "wireless_device_manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "wireless_device_model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "wireless_device_name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "wireless_device_protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "wireless_device_sw_version": {
           "description": "Software version of the end node device",
           "type": "string"
         }
@@ -1534,35 +1538,6 @@ func init() {
         }
       }
     },
-    "ble_characteristic": {
-      "type": "object",
-      "properties": {
-        "access_mode": {
-          "description": "Access mode of characteristic, ReadWrite or ReadOnly",
-          "type": "string"
-        },
-        "characteristic_uuid": {
-          "description": "unique identifier of characteristic",
-          "type": "string"
-        },
-        "name": {
-          "description": "Friendly name of the BLE characteristic.",
-          "type": "string"
-        },
-        "service_uuid": {
-          "description": "parent service uuid.",
-          "type": "string"
-        },
-        "unit": {
-          "description": "The unit of of characteristic.",
-          "type": "string"
-        },
-        "value": {
-          "description": "value transferred on this characteristic",
-          "type": "string"
-        }
-      }
-    },
     "boot": {
       "type": "object",
       "properties": {
@@ -1735,6 +1710,47 @@ func init() {
           "type": "integer",
           "minimum": 0,
           "exclusiveMinimum": true
+        }
+      }
+    },
+    "device_property": {
+      "type": "object",
+      "properties": {
+        "property_access_mode": {
+          "description": "access mode of the property, Read or ReadWrite",
+          "type": "string"
+        },
+        "property_description": {
+          "description": "Description of the property",
+          "type": "string"
+        },
+        "property_identifier": {
+          "description": "unique identifier of the property",
+          "type": "string"
+        },
+        "property_last_seen": {
+          "description": "Last activity of the property",
+          "type": "string"
+        },
+        "property_name": {
+          "description": "Friendly name of the BLE characteristic.",
+          "type": "string"
+        },
+        "property_reading": {
+          "description": "value of property supporting Read only",
+          "type": "string"
+        },
+        "property_service_uuid": {
+          "description": "property service uuid.",
+          "type": "string"
+        },
+        "property_state": {
+          "description": "value of property allowing ReadWrite",
+          "type": "string"
+        },
+        "property_unit": {
+          "description": "Unit of the property",
+          "type": "string"
         }
       }
     },
@@ -2461,61 +2477,53 @@ func init() {
     "wireless_device": {
       "type": "object",
       "properties": {
-        "availability": {
+        "device_properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/device_property"
+          }
+        },
+        "wireless_device_availability": {
           "description": "Online status of the end device; Online/offline",
           "type": "string"
         },
-        "battery": {
+        "wireless_device_battery": {
           "description": "Battery percentage of the end device; otherwise null",
           "type": "string"
         },
-        "ble_characteristics": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ble_characteristic"
-          }
-        },
-        "connection": {
+        "wireless_device_connection": {
           "description": "Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.",
           "type": "string"
         },
-        "device_type": {
-          "description": "Whether the device is a sensor or actuator",
-          "type": "string"
-        },
-        "identifiers": {
-          "description": "unique identifier for device e.g. Serial number",
-          "type": "string"
-        },
-        "last_seen": {
-          "description": "The last time the end node transacted",
-          "type": "string"
-        },
-        "manufacturer": {
-          "description": "Device Manufacturer of the end node",
-          "type": "string"
-        },
-        "model": {
-          "description": "Model number/string of the end node device",
-          "type": "string"
-        },
-        "name": {
-          "description": "Friendly name of the device.",
-          "type": "string"
-        },
-        "protocol": {
-          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
-          "type": "string"
-        },
-        "readings": {
+        "wireless_device_description": {
           "description": "if end node device is a sensor, JSON format data will be here otherwise will be null",
           "type": "string"
         },
-        "state": {
-          "description": "This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE",
+        "wireless_device_identifier": {
+          "description": "unique identifier for device e.g. Serial number",
           "type": "string"
         },
-        "sw_version": {
+        "wireless_device_last_seen": {
+          "description": "The last time the end node transacted",
+          "type": "string"
+        },
+        "wireless_device_manufacturer": {
+          "description": "Device Manufacturer of the end node",
+          "type": "string"
+        },
+        "wireless_device_model": {
+          "description": "Model number/string of the end node device",
+          "type": "string"
+        },
+        "wireless_device_name": {
+          "description": "Friendly name of the device.",
+          "type": "string"
+        },
+        "wireless_device_protocol": {
+          "description": "Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.",
+          "type": "string"
+        },
+        "wireless_device_sw_version": {
           "description": "Software version of the end node device",
           "type": "string"
         }

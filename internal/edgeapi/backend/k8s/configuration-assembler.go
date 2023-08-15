@@ -109,7 +109,7 @@ func (a *ConfigurationAssembler) GetDeviceConfiguration(ctx context.Context, edg
 	dc.Configuration.Heartbeat = getHeartbeatConfiguration(edgeDevice, deviceSet)
 	dc.Configuration.Os = getOsConfiguration(edgeDevice, deviceSet)
 	dc.Configuration.Mounts = a.getMountConfiguration(ctx, edgeDevice, deviceSet)
-	dc.Configuration.WirelessDevices = a.getWirelessDevicesConfiguration(ctx, edgeDevice, logger)
+	// dc.Configuration.WirelessDevices = a.getWirelessDevicesConfiguration(ctx, edgeDevice, logger)
 
 	var err error
 	dc.Configuration.Storage, err = a.getStorageConfiguration(ctx, edgeDevice, deviceSet)
@@ -284,6 +284,7 @@ func (a *ConfigurationAssembler) getMountConfiguration(ctx context.Context, edge
 }
 
 //NEW CODE
+/*
 func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Context, edgeDevice *v1alpha1.EdgeDevice, logger *zap.SugaredLogger) []*models.WirelessDevice {
 	wirelessDeviceConfigSpec := edgeDevice.Spec.WirelessDevices
 
@@ -340,7 +341,7 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 
 	return wireless_devices
 }
-
+*/
 func (a *ConfigurationAssembler) toWorkloadList(ctx context.Context, logger *zap.SugaredLogger, edgeworkloads []v1alpha1.EdgeWorkload, device *v1alpha1.EdgeDevice) (models.WorkloadList, error) {
 	list := models.WorkloadList{}
 	for _, edgeworkload := range edgeworkloads {

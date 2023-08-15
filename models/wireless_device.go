@@ -19,54 +19,48 @@ import (
 // swagger:model wireless_device
 type WirelessDevice struct {
 
+	// device properties
+	DeviceProperties []*DeviceProperty `json:"device_properties"`
+
 	// Online status of the end device; Online/offline
-	Availability string `json:"availability,omitempty"`
+	WirelessDeviceAvailability string `json:"wireless_device_availability,omitempty"`
 
 	// Battery percentage of the end device; otherwise null
-	Battery string `json:"battery,omitempty"`
-
-	// ble characteristics
-	BleCharacteristics []*BleCharacteristic `json:"ble_characteristics"`
+	WirelessDeviceBattery string `json:"wireless_device_battery,omitempty"`
 
 	// Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.
-	Connection string `json:"connection,omitempty"`
-
-	// Whether the device is a sensor or actuator
-	DeviceType string `json:"device_type,omitempty"`
-
-	// unique identifier for device e.g. Serial number
-	Identifiers string `json:"identifiers,omitempty"`
-
-	// The last time the end node transacted
-	LastSeen string `json:"last_seen,omitempty"`
-
-	// Device Manufacturer of the end node
-	Manufacturer string `json:"manufacturer,omitempty"`
-
-	// Model number/string of the end node device
-	Model string `json:"model,omitempty"`
-
-	// Friendly name of the device.
-	Name string `json:"name,omitempty"`
-
-	// Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
-	Protocol string `json:"protocol,omitempty"`
+	WirelessDeviceConnection string `json:"wireless_device_connection,omitempty"`
 
 	// if end node device is a sensor, JSON format data will be here otherwise will be null
-	Readings string `json:"readings,omitempty"`
+	WirelessDeviceDescription string `json:"wireless_device_description,omitempty"`
 
-	// This will show the status of the end node if it is a switch or actuator. ON/OFF, 1/0, TRUE/FALSE
-	State string `json:"state,omitempty"`
+	// unique identifier for device e.g. Serial number
+	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
+
+	// The last time the end node transacted
+	WirelessDeviceLastSeen string `json:"wireless_device_last_seen,omitempty"`
+
+	// Device Manufacturer of the end node
+	WirelessDeviceManufacturer string `json:"wireless_device_manufacturer,omitempty"`
+
+	// Model number/string of the end node device
+	WirelessDeviceModel string `json:"wireless_device_model,omitempty"`
+
+	// Friendly name of the device.
+	WirelessDeviceName string `json:"wireless_device_name,omitempty"`
+
+	// Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
+	WirelessDeviceProtocol string `json:"wireless_device_protocol,omitempty"`
 
 	// Software version of the end node device
-	SwVersion string `json:"sw_version,omitempty"`
+	WirelessDeviceSwVersion string `json:"wireless_device_sw_version,omitempty"`
 }
 
 // Validate validates this wireless device
 func (m *WirelessDevice) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateBleCharacteristics(formats); err != nil {
+	if err := m.validateDeviceProperties(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -76,22 +70,22 @@ func (m *WirelessDevice) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *WirelessDevice) validateBleCharacteristics(formats strfmt.Registry) error {
-	if swag.IsZero(m.BleCharacteristics) { // not required
+func (m *WirelessDevice) validateDeviceProperties(formats strfmt.Registry) error {
+	if swag.IsZero(m.DeviceProperties) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(m.BleCharacteristics); i++ {
-		if swag.IsZero(m.BleCharacteristics[i]) { // not required
+	for i := 0; i < len(m.DeviceProperties); i++ {
+		if swag.IsZero(m.DeviceProperties[i]) { // not required
 			continue
 		}
 
-		if m.BleCharacteristics[i] != nil {
-			if err := m.BleCharacteristics[i].Validate(formats); err != nil {
+		if m.DeviceProperties[i] != nil {
+			if err := m.DeviceProperties[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+					return ve.ValidateName("device_properties" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+					return ce.ValidateName("device_properties" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -106,7 +100,7 @@ func (m *WirelessDevice) validateBleCharacteristics(formats strfmt.Registry) err
 func (m *WirelessDevice) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateBleCharacteristics(ctx, formats); err != nil {
+	if err := m.contextValidateDeviceProperties(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -116,16 +110,16 @@ func (m *WirelessDevice) ContextValidate(ctx context.Context, formats strfmt.Reg
 	return nil
 }
 
-func (m *WirelessDevice) contextValidateBleCharacteristics(ctx context.Context, formats strfmt.Registry) error {
+func (m *WirelessDevice) contextValidateDeviceProperties(ctx context.Context, formats strfmt.Registry) error {
 
-	for i := 0; i < len(m.BleCharacteristics); i++ {
+	for i := 0; i < len(m.DeviceProperties); i++ {
 
-		if m.BleCharacteristics[i] != nil {
-			if err := m.BleCharacteristics[i].ContextValidate(ctx, formats); err != nil {
+		if m.DeviceProperties[i] != nil {
+			if err := m.DeviceProperties[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+					return ve.ValidateName("device_properties" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("ble_characteristics" + "." + strconv.Itoa(i))
+					return ce.ValidateName("device_properties" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

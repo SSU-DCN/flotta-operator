@@ -198,10 +198,10 @@ func (h *Handler) PostDataMessageForDevice(ctx context.Context, params yggdrasil
 		if err != nil {
 			return operations.NewPostDataMessageForDeviceBadRequest()
 		}
-		_, err = h.backend.HandleWirelessDevices(ctx, deviceID, h.getNamespace(ctx), hb.Hardware.WirelessDevices)
-		if err != nil {
-			logger.Errorf("Edge device in HB %s", err)
-		}
+		// _, err = h.backend.HandleWirelessDevices(ctx, deviceID, h.getNamespace(ctx), hb.Hardware.WirelessDevices)
+		// if err != nil {
+		// 	logger.Errorf("Edge device in HB %s", err)
+		// }
 
 		err = h.heartbeatHandler.Process(ctx, deviceID, h.getNamespace(ctx), &hb)
 
