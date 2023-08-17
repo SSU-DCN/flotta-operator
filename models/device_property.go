@@ -43,6 +43,9 @@ type DeviceProperty struct {
 
 	// Unit of the property
 	PropertyUnit string `json:"property_unit,omitempty"`
+
+	// use device unique identifier to pair property to a device
+	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
 }
 
 // Validate validates this device property

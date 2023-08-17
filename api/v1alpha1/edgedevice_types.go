@@ -41,7 +41,7 @@ type EdgeDeviceSpec struct {
 	Mounts        []*Mount                        `json:"mounts,omitempty"`
 
 	// list of all wireless devices found on edgedevice
-	WirelessDevices []*WirelessDevices `json:"wirelessDevices,omitempty"`
+	WirelessDevices []*WirelessDevice `json:"wirelessDevices,omitempty"`
 }
 
 type MetricsReceiverConfiguration struct {
@@ -146,7 +146,7 @@ type EdgeDeviceStatus struct {
 	LastSyncedResourceVersion string    `json:"lastSyncedResourceVersion,omitempty"`
 	Hardware                  *Hardware `json:"hardware,omitempty"`
 	// list of all wireless devices found on edgedevice
-	WirelessDevices    []*WirelessDevices  `json:"wirelessDevices,omitempty"`
+	WirelessDevices    []*WirelessDevice   `json:"wirelessDevices,omitempty"`
 	Workloads          []Workload          `json:"workloads,omitempty"`
 	PlaybookExecutions []PlaybookExec      `json:"PlaybookExec,omitempty"`
 	DataOBC            *string             `json:"dataObc,omitempty"`
@@ -433,45 +433,77 @@ type Mount struct {
 }
 
 //new component
-type WirelessDevices struct {
-	Name         string `json:"name"`
-	Manufacturer string `json:"manufacturer,omitempty"`
-	Model        string `json:"model,omitempty"`
-	SWVersion    string `json:"swVersion,omitempty"`
-	Identifiers  string `json:"identifiers"`
-	Protocol     string `json:"protocol,omitempty"`
-	Connection   string `json:"connection,omitempty"`
-	Battery      string `json:"battery,omitempty"`
-	DeviceType   string `json:"deviceType,omitempty"`
-	Availability string `json:"availability,omitempty"`
-	Readings     string `json:"readings,omitempty"`
-	State        string `json:"state,omitempty"`
-	LastSeen     string `json:"lastSeen,omitempty"`
+type WirelessDevice struct {
 
-	// ble characteristics
-	BleCharacteristics []*BleCharacteristic `json:"ble_characteristics,omitempty"`
+	// device properties
+	DeviceProperties []*DeviceProperty `json:"device_properties"`
+
+	// Online status of the end device; Online/offline
+	WirelessDeviceAvailability string `json:"wireless_device_availability,omitempty"`
+
+	// Battery percentage of the end device; otherwise null
+	WirelessDeviceBattery string `json:"wireless_device_battery,omitempty"`
+
+	// Communication method used by the end node device. Zigbee, Wi-Fi, BLE, Zigbee etc.
+	WirelessDeviceConnection string `json:"wireless_device_connection,omitempty"`
+
+	// if end node device is a sensor, JSON format data will be here otherwise will be null
+	WirelessDeviceDescription string `json:"wireless_device_description,omitempty"`
+
+	// unique identifier for device e.g. Serial number
+	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
+
+	// The last time the end node transacted
+	WirelessDeviceLastSeen string `json:"wireless_device_last_seen,omitempty"`
+
+	// Device Manufacturer of the end node
+	WirelessDeviceManufacturer string `json:"wireless_device_manufacturer,omitempty"`
+
+	// Model number/string of the end node device
+	WirelessDeviceModel string `json:"wireless_device_model,omitempty"`
+
+	// Friendly name of the device.
+	WirelessDeviceName string `json:"wireless_device_name,omitempty"`
+
+	// Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
+	WirelessDeviceProtocol string `json:"wireless_device_protocol,omitempty"`
+
+	// Software version of the end node device
+	WirelessDeviceSwVersion string `json:"wireless_device_sw_version,omitempty"`
 }
 
 // wireless property
-type BleCharacteristic struct {
+type DeviceProperty struct {
 
-	// Access mode of characteristic, ReadWrite or ReadOnly
-	AccessMode string `json:"access_mode,omitempty"`
+	// access mode of the property, Read or ReadWrite
+	PropertyAccessMode string `json:"property_access_mode,omitempty"`
 
-	// unique identifier of characteristic
-	CharacteristicUUID string `json:"characteristic_uuid,omitempty"`
+	// Description of the property
+	PropertyDescription string `json:"property_description,omitempty"`
+
+	// unique identifier of the property
+	PropertyIdentifier string `json:"property_identifier,omitempty"`
+
+	// Last activity of the property
+	PropertyLastSeen string `json:"property_last_seen,omitempty"`
 
 	// Friendly name of the BLE characteristic.
-	Name string `json:"name,omitempty"`
+	PropertyName string `json:"property_name,omitempty"`
 
-	// parent service uuid.
-	ServiceUUID string `json:"service_uuid,omitempty"`
+	// value of property supporting Read only
+	PropertyReading string `json:"property_reading,omitempty"`
 
-	// The unit of of characteristic.
-	Unit string `json:"unit,omitempty"`
+	// property service uuid.
+	PropertyServiceUUID string `json:"property_service_uuid,omitempty"`
 
-	// value transferred on this characteristic
-	Value string `json:"value,omitempty"`
+	// value of property allowing ReadWrite
+	PropertyState string `json:"property_state,omitempty"`
+
+	// Unit of the property
+	PropertyUnit string `json:"property_unit,omitempty"`
+
+	// use device unique identifier to pair property to a device
+	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
 }
 
 //+kubebuilder:object:root=true

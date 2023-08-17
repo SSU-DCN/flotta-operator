@@ -879,6 +879,9 @@ definitions:
   device_property:
     type: object
     properties:
+      wireless_device_identifier:
+        description: use device unique identifier to pair property to a device 
+        type: string
       property_identifier:
         description: unique identifier of the property
         type: string

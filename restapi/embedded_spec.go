@@ -437,6 +437,10 @@ func init() {
         "property_unit": {
           "description": "Unit of the property",
           "type": "string"
+        },
+        "wireless_device_identifier": {
+          "description": "use device unique identifier to pair property to a device",
+          "type": "string"
         }
       }
     },
@@ -1750,6 +1754,10 @@ func init() {
         },
         "property_unit": {
           "description": "Unit of the property",
+          "type": "string"
+        },
+        "wireless_device_identifier": {
+          "description": "use device unique identifier to pair property to a device",
           "type": "string"
         }
       }

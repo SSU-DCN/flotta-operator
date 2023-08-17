@@ -50,7 +50,7 @@ type EdgeDeviceBackend interface {
 	UpdateStatus(ctx context.Context, name, namespace string, heartbeat *models.Heartbeat) (bool, error)
 
 	//NEW CODE
-	// HandleWirelessDevices(ctx context.Context, name, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error)
+	HandleWirelessDevices(ctx context.Context, name, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error)
 }
 
 // NotApproved is an error representing situation when edge device had been enrolled but hasn't been approved yet
