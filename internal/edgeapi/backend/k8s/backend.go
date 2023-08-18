@@ -231,27 +231,28 @@ func (b *backend) updateDeviceStatus(ctx context.Context, device *v1alpha1.EdgeD
 
 //NEW CODE
 // ManageWirelessDevices implements backend.EdgeDeviceBackend.
-func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, wirelessDevices []*models.WirelessDevice) (bool, error) {
+func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namespace string, hbWirelessDevices []*models.WirelessDevice) (bool, error) {
 	edgeDevice, err := b.repository.GetEdgeDevice(ctx, name, namespace)
 	if err != nil {
 		return false, fmt.Errorf("failed to get edge device: %w", err)
 	}
 
-	oldEdgeDevice := edgeDevice.DeepCopy()
-	specWirelessDevices := oldEdgeDevice.Spec.WirelessDevices
-	statusWirelessDevices := oldEdgeDevice.Status.WirelessDevices
-	patch := client.MergeFrom(oldEdgeDevice)
+	copyEdgeDevice := edgeDevice.DeepCopy()
+	specWirelessDevicesList := copyEdgeDevice.Spec.WirelessDevices
+	// statusWirelessDevices := oldEdgeDevice.Status.WirelessDevices
+	// patch := client.MergeFrom(oldEdgeDevice)
 
-	var wirelessDevicesSpec []*v1alpha1.WirelessDevice = specWirelessDevices
-	appliedWorkloadsPlugin := false // Move this outside the for loop
+	var wirelessDevicesSpec []*v1alpha1.WirelessDevice = specWirelessDevicesList
+	// appliedWorkloadsPlugin := false // Move this outside the for loop
 
-	for _, HBwirelessDevice := range wirelessDevices {
+	for _, HBwirelessDevice := range hbWirelessDevices {
 
-		b.logger.Info(HBwirelessDevice)
+		b.logger.Info(HBwirelessDevice.WirelessDeviceIdentifier)
 
 		// Check if the wireless device has a matching registered device in the spec
-		matchedDevice := searchWirelessDevice(specWirelessDevices, HBwirelessDevice.WirelessDeviceName, HBwirelessDevice.WirelessDeviceIdentifier)
+		matchedDevice := b.searchWirelessDevice(specWirelessDevicesList, HBwirelessDevice.WirelessDeviceName, HBwirelessDevice.WirelessDeviceIdentifier)
 		if !matchedDevice {
+			b.logger.Info("NEW DEVCE ", HBwirelessDevice.WirelessDeviceIdentifier)
 
 			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
 			convertedDevice := &v1alpha1.WirelessDevice{
@@ -307,102 +308,22 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			wirelessDevicesSpec = append(wirelessDevicesSpec, convertedDevice)
 
 			//check if the end node data matches the autoconfig
-			if !appliedWorkloadsPlugin {
-				hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice.Namespace, edgeDevice.Name, HBwirelessDevice)
-				if !hasApplied {
-					b.logger.Error("An error occurred while applying for EndNodeAutoConfig: %s", err.Error())
-				} else {
-					appliedWorkloadsPlugin = true
-				}
-			}
-		}
-
-		// Check if the wireless device has a matching registered device in the status
-		matchedDeviceStatus := searchWirelessDevice(statusWirelessDevices, HBwirelessDevice.WirelessDeviceName, HBwirelessDevice.WirelessDeviceIdentifier)
-
-		if !matchedDeviceStatus {
-			// Create a new instance of v1alpha1.WirelessDevices and populate it with the new values
-			convertedDevice := &v1alpha1.WirelessDevice{
-				WirelessDeviceName:         HBwirelessDevice.WirelessDeviceName,
-				WirelessDeviceManufacturer: HBwirelessDevice.WirelessDeviceManufacturer,
-				WirelessDeviceModel:        HBwirelessDevice.WirelessDeviceModel,
-				WirelessDeviceSwVersion:    HBwirelessDevice.WirelessDeviceSwVersion,
-				WirelessDeviceIdentifier:   HBwirelessDevice.WirelessDeviceIdentifier,
-				WirelessDeviceProtocol:     HBwirelessDevice.WirelessDeviceProtocol,
-				WirelessDeviceConnection:   HBwirelessDevice.WirelessDeviceConnection,
-				WirelessDeviceAvailability: HBwirelessDevice.WirelessDeviceConnection,
-				WirelessDeviceBattery:      HBwirelessDevice.WirelessDeviceBattery,
-				WirelessDeviceDescription:  HBwirelessDevice.WirelessDeviceDescription,
-				WirelessDeviceLastSeen:     HBwirelessDevice.WirelessDeviceLastSeen,
-			}
-
-			//check if the values are available in the struct
-			// if HBwirelessDevice.Availability != "" {
-			// 	convertedDevice.Availability = HBwirelessDevice.Availability
+			// if !appliedWorkloadsPlugin {
+			// 	hasApplied, err := b.applyWorkloadsFromEndNodeAutoConfig(ctx, edgeDevice.Namespace, edgeDevice.Name, HBwirelessDevice)
+			// 	if !hasApplied {
+			// 		b.logger.Error("An error occurred while applying for EndNodeAutoConfig: %s", err.Error())
+			// 	} else {
+			// 		appliedWorkloadsPlugin = true
+			// 	}
 			// }
-
-			var deviceProperties []*v1alpha1.DeviceProperty
-			for _, propertyData := range HBwirelessDevice.DeviceProperties {
-				property := &v1alpha1.DeviceProperty{
-					PropertyAccessMode:       propertyData.PropertyName,
-					PropertyDescription:      propertyData.PropertyDescription,
-					PropertyIdentifier:       propertyData.PropertyIdentifier,
-					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
-					PropertyLastSeen:         propertyData.PropertyLastSeen,
-					PropertyName:             propertyData.PropertyName,
-					PropertyReading:          propertyData.PropertyReading,
-					PropertyServiceUUID:      propertyData.PropertyServiceUUID,
-					PropertyState:            propertyData.PropertyState,
-					PropertyUnit:             propertyData.PropertyUnit,
-				}
-
-				deviceProperties = append(deviceProperties, property)
-			}
-			convertedDevice.DeviceProperties = deviceProperties
-
-			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
-		} else {
-
-			b.logger.Info("Update the status")
-			// The wireless device already exists in the status, update it
-
-			for _, device := range edgeDevice.Status.WirelessDevices {
-				if device.WirelessDeviceIdentifier == HBwirelessDevice.WirelessDeviceIdentifier {
-					// Update the existing device with the new values
-					// device.WirelessDeviceName = HBwirelessDevice.WirelessDeviceName
-					device.WirelessDeviceLastSeen = HBwirelessDevice.WirelessDeviceLastSeen
-
-					for _, devicePropertyData := range device.DeviceProperties {
-						exists, hbProperty := matchingPropertyIdentifier(devicePropertyData.PropertyIdentifier, HBwirelessDevice.DeviceProperties)
-
-						if exists {
-							devicePropertyData.PropertyAccessMode = hbProperty.PropertyAccessMode
-							devicePropertyData.PropertyDescription = hbProperty.PropertyDescription
-							devicePropertyData.PropertyIdentifier = hbProperty.PropertyIdentifier
-							devicePropertyData.WirelessDeviceIdentifier = hbProperty.WirelessDeviceIdentifier
-							devicePropertyData.PropertyLastSeen = hbProperty.PropertyLastSeen
-							devicePropertyData.PropertyName = hbProperty.PropertyName
-							devicePropertyData.PropertyReading = hbProperty.PropertyReading
-							devicePropertyData.PropertyServiceUUID = hbProperty.PropertyServiceUUID
-							devicePropertyData.PropertyState = hbProperty.PropertyState
-							devicePropertyData.PropertyUnit = hbProperty.PropertyUnit
-						}
-					}
-
-					// if device.Manufacturer != "" {
-					// 	device.Manufacturer = HBwirelessDevice.Availability
-					// }
-
-				}
-			}
-
 		}
+
 	}
 
 	// Patch the edgeDevice with the updated or added devices
-	if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
-		return false, fmt.Errorf("failed to patch edge device status : %w", err)
-	}
+	// if err := b.repository.PatchEdgeDeviceStatus(ctx, edgeDevice, &patch); err != nil {
+	// 	return false, fmt.Errorf("failed to patch edge device status : %w", err)
+	// }
 
 	edgeDevice2, err := b.repository.GetEdgeDevice(ctx, name, namespace)
 	if err != nil {
@@ -420,7 +341,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 
 // Other functions are unchanged from the previous version.
 
-func searchWirelessDevice(slice []*v1alpha1.WirelessDevice, targetName, targetIdentifiers string) bool {
+func (b *backend) searchWirelessDevice(slice []*v1alpha1.WirelessDevice, targetName, targetIdentifiers string) bool {
 	for _, device := range slice {
 		if device.WirelessDeviceIdentifier == targetIdentifiers {
 			return true // Found the target WirelessDevice in the slice
@@ -429,7 +350,8 @@ func searchWirelessDevice(slice []*v1alpha1.WirelessDevice, targetName, targetId
 	return false // Target WirelessDevice not found in the slice
 }
 
-func matchingPropertyIdentifier(propertyIdentifierToCheck string, HBwirelessDeviceProperties []*models.DeviceProperty) (bool, *models.DeviceProperty) {
+func (b *backend) matchingPropertyIdentifier(propertyIdentifierToCheck string, HBwirelessDeviceProperties []*models.DeviceProperty) (bool, *models.DeviceProperty) {
+	b.logger.Infof("WE ARE IN THE matchingPropertyIdentifier FUNCTION")
 	for _, hbwirelessDeviceProperty := range HBwirelessDeviceProperties {
 		if hbwirelessDeviceProperty.PropertyIdentifier == propertyIdentifierToCheck {
 			return true, hbwirelessDeviceProperty

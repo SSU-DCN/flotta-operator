@@ -109,7 +109,7 @@ func (a *ConfigurationAssembler) GetDeviceConfiguration(ctx context.Context, edg
 	dc.Configuration.Heartbeat = getHeartbeatConfiguration(edgeDevice, deviceSet)
 	dc.Configuration.Os = getOsConfiguration(edgeDevice, deviceSet)
 	dc.Configuration.Mounts = a.getMountConfiguration(ctx, edgeDevice, deviceSet)
-	// dc.Configuration.WirelessDevices = a.getWirelessDevicesConfiguration(ctx, edgeDevice, logger)
+	dc.Configuration.WirelessDevices = a.getWirelessDevicesConfiguration(ctx, edgeDevice, logger)
 
 	var err error
 	dc.Configuration.Storage, err = a.getStorageConfiguration(ctx, edgeDevice, deviceSet)
@@ -284,11 +284,11 @@ func (a *ConfigurationAssembler) getMountConfiguration(ctx context.Context, edge
 }
 
 //NEW CODE
-/*
+
 func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Context, edgeDevice *v1alpha1.EdgeDevice, logger *zap.SugaredLogger) []*models.WirelessDevice {
 	wirelessDeviceConfigSpec := edgeDevice.Spec.WirelessDevices
 
-	// logger.Info("GET DEVICES CONFIG")
+	logger.Info("GET DEVICES CONFIG")
 
 	if wirelessDeviceConfigSpec == nil {
 		return []*models.WirelessDevice{}
@@ -301,25 +301,19 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 		}
 
 		wireless_device := &models.WirelessDevice{
-			Availability: (*m).Availability,
-			Battery:      (*m).Battery,
-			Connection:   (*m).Connection,
-			DeviceType:   (*m).DeviceType,
-			Identifiers:  (*m).Identifiers,
-			LastSeen:     (*m).LastSeen,
-			Manufacturer: (*m).Manufacturer,
-			Model:        (*m).Model,
-			Name:         (*m).Name,
-			Protocol:     (*m).Protocol,
-			SwVersion:    (*m).SWVersion,
+			WirelessDeviceName:         (*m).WirelessDeviceName,
+			WirelessDeviceManufacturer: (*m).WirelessDeviceManufacturer,
+			WirelessDeviceModel:        (*m).WirelessDeviceModel,
+			WirelessDeviceSwVersion:    (*m).WirelessDeviceSwVersion,
+			WirelessDeviceIdentifier:   (*m).WirelessDeviceIdentifier,
+			WirelessDeviceProtocol:     (*m).WirelessDeviceProtocol,
+			WirelessDeviceConnection:   (*m).WirelessDeviceConnection,
+			WirelessDeviceBattery:      (*m).WirelessDeviceBattery,
+			WirelessDeviceDescription:  (*m).WirelessDeviceDescription,
+			WirelessDeviceLastSeen:     (*m).WirelessDeviceLastSeen,
 		}
 
 		// Check if the readings slice is not empty
-		if len((*m).Readings) > 0 {
-			wireless_device.Readings = (*m).Readings
-		} else {
-			wireless_device.State = (*m).State
-		}
 
 		wireless_devices = append(wireless_devices, wireless_device)
 	}
@@ -341,7 +335,7 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 
 	return wireless_devices
 }
-*/
+
 func (a *ConfigurationAssembler) toWorkloadList(ctx context.Context, logger *zap.SugaredLogger, edgeworkloads []v1alpha1.EdgeWorkload, device *v1alpha1.EdgeDevice) (models.WorkloadList, error) {
 	list := models.WorkloadList{}
 	for _, edgeworkload := range edgeworkloads {
