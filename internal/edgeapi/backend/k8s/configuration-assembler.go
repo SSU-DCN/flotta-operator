@@ -313,8 +313,26 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 			WirelessDeviceLastSeen:     (*m).WirelessDeviceLastSeen,
 		}
 
-		// Check if the readings slice is not empty
+		var wireless_device_properties []*models.DeviceProperty
+		for _, propertyData := range (*m).DeviceProperties {
+			deviceProperty := &models.DeviceProperty{
+				PropertyAccessMode:       propertyData.PropertyName,
+				PropertyDescription:      propertyData.PropertyDescription,
+				PropertyIdentifier:       propertyData.PropertyIdentifier,
+				WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
+				PropertyLastSeen:         propertyData.PropertyLastSeen,
+				PropertyName:             propertyData.PropertyName,
+				PropertyReading:          propertyData.PropertyReading,
+				PropertyServiceUUID:      propertyData.PropertyServiceUUID,
+				PropertyState:            propertyData.PropertyState,
+				PropertyUnit:             propertyData.PropertyUnit,
+			}
 
+			wireless_device_properties = append(wireless_device_properties, deviceProperty)
+		}
+
+		// Check if the readings slice is not empty
+		wireless_device.DeviceProperties = wireless_device_properties
 		wireless_devices = append(wireless_devices, wireless_device)
 	}
 

@@ -17,3 +17,4 @@ spec:
         - name: workload-iot
           image: quay.io/bitnami/nginx:1.20
 
+//also apply edge workloads based on specific edge devices
