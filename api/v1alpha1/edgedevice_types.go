@@ -434,9 +434,11 @@ type Mount struct {
 
 //new component
 type WirelessDevice struct {
+	// Friendly name of the device.
+	WirelessDeviceName string `json:"wireless_device_name,omitempty"`
 
-	// device properties
-	DeviceProperties []*DeviceProperty `json:"device_properties"`
+	// unique identifier for device e.g. Serial number
+	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
 
 	// Online status of the end device; Online/offline
 	WirelessDeviceAvailability string `json:"wireless_device_availability,omitempty"`
@@ -450,9 +452,6 @@ type WirelessDevice struct {
 	// if end node device is a sensor, JSON format data will be here otherwise will be null
 	WirelessDeviceDescription string `json:"wireless_device_description,omitempty"`
 
-	// unique identifier for device e.g. Serial number
-	WirelessDeviceIdentifier string `json:"wireless_device_identifier,omitempty"`
-
 	// The last time the end node transacted
 	WirelessDeviceLastSeen string `json:"wireless_device_last_seen,omitempty"`
 
@@ -462,14 +461,14 @@ type WirelessDevice struct {
 	// Model number/string of the end node device
 	WirelessDeviceModel string `json:"wireless_device_model,omitempty"`
 
-	// Friendly name of the device.
-	WirelessDeviceName string `json:"wireless_device_name,omitempty"`
-
 	// Transfer protocol used by the end node device. MQTT, HTTP, COAP etc.
 	WirelessDeviceProtocol string `json:"wireless_device_protocol,omitempty"`
 
 	// Software version of the end node device
 	WirelessDeviceSwVersion string `json:"wireless_device_sw_version,omitempty"`
+
+	// device properties
+	DeviceProperties []*DeviceProperty `json:"device_properties,omitempty"`
 }
 
 // wireless property

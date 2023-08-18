@@ -286,8 +286,6 @@ spec:
                     wireless_device_sw_version:
                       description: Software version of the end node device
                       type: string
-                  required:
-                  - device_properties
                   type: object
                 type: array
             type: object
@@ -691,8 +689,6 @@ spec:
                     wireless_device_sw_version:
                       description: Software version of the end node device
                       type: string
-                  required:
-                  - device_properties
                   type: object
                 type: array
               workloads:
