@@ -288,16 +288,17 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			var deviceProperties []*v1alpha1.DeviceProperty
 			for _, propertyData := range HBwirelessDevice.DeviceProperties {
 				property := &v1alpha1.DeviceProperty{
-					PropertyAccessMode:       propertyData.PropertyName,
+					PropertyName:             propertyData.PropertyName,
+					PropertyAccessMode:       propertyData.PropertyAccessMode,
 					PropertyDescription:      propertyData.PropertyDescription,
 					PropertyIdentifier:       propertyData.PropertyIdentifier,
 					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
 					PropertyLastSeen:         propertyData.PropertyLastSeen,
-					PropertyName:             propertyData.PropertyName,
-					PropertyReading:          propertyData.PropertyReading,
-					PropertyServiceUUID:      propertyData.PropertyServiceUUID,
-					PropertyState:            propertyData.PropertyState,
-					PropertyUnit:             propertyData.PropertyUnit,
+
+					PropertyReading:     propertyData.PropertyReading,
+					PropertyServiceUUID: propertyData.PropertyServiceUUID,
+					PropertyState:       propertyData.PropertyState,
+					PropertyUnit:        propertyData.PropertyUnit,
 				}
 
 				deviceProperties = append(deviceProperties, property)
@@ -344,16 +345,17 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			var deviceProperties []*v1alpha1.DeviceProperty
 			for _, propertyData := range HBwirelessDevice.DeviceProperties {
 				property := &v1alpha1.DeviceProperty{
-					PropertyAccessMode:       propertyData.PropertyName,
+					PropertyName:             propertyData.PropertyName,
+					PropertyAccessMode:       propertyData.PropertyAccessMode,
 					PropertyDescription:      propertyData.PropertyDescription,
 					PropertyIdentifier:       propertyData.PropertyIdentifier,
 					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
 					PropertyLastSeen:         propertyData.PropertyLastSeen,
-					PropertyName:             propertyData.PropertyName,
-					PropertyReading:          propertyData.PropertyReading,
-					PropertyServiceUUID:      propertyData.PropertyServiceUUID,
-					PropertyState:            propertyData.PropertyState,
-					PropertyUnit:             propertyData.PropertyUnit,
+
+					PropertyReading:     propertyData.PropertyReading,
+					PropertyServiceUUID: propertyData.PropertyServiceUUID,
+					PropertyState:       propertyData.PropertyState,
+					PropertyUnit:        propertyData.PropertyUnit,
 				}
 
 				deviceProperties = append(deviceProperties, property)
