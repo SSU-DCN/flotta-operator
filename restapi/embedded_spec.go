@@ -335,11 +335,30 @@ func init() {
         }
       }
     },
+    "db_wireless_device": {
+      "type": "object",
+      "properties": {
+        "wireless_device_identifier": {
+          "description": "unique identifier of the unregistered device",
+          "type": "string"
+        },
+        "wireless_device_name": {
+          "description": "name of the unregistered device",
+          "type": "string"
+        }
+      }
+    },
     "device-configuration": {
       "type": "object",
       "properties": {
         "ansible-manager": {
           "$ref": "#/definitions/ansible-manager-configuration"
+        },
+        "db_wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/db_wireless_device"
+          }
         },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"
@@ -1652,11 +1671,30 @@ func init() {
         }
       }
     },
+    "db_wireless_device": {
+      "type": "object",
+      "properties": {
+        "wireless_device_identifier": {
+          "description": "unique identifier of the unregistered device",
+          "type": "string"
+        },
+        "wireless_device_name": {
+          "description": "name of the unregistered device",
+          "type": "string"
+        }
+      }
+    },
     "device-configuration": {
       "type": "object",
       "properties": {
         "ansible-manager": {
           "$ref": "#/definitions/ansible-manager-configuration"
+        },
+        "db_wireless_devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/db_wireless_device"
+          }
         },
         "heartbeat": {
           "$ref": "#/definitions/heartbeat-configuration"

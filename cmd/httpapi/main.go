@@ -34,6 +34,7 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/backend/factory"
+	"github.com/project-flotta/flotta-operator/internal/edgeapi/database"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/yggdrasil"
 	"github.com/project-flotta/flotta-operator/pkg/mtls"
 	"github.com/project-flotta/flotta-operator/restapi"
@@ -68,6 +69,13 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	err = database.InitConnection(Config.DBUser, Config.DBPassword, Config.DBHost, Config.DBPort, Config.DBName, Config.SSLMode)
+	if err != nil {
+		logger.Errorf("Cannot prepare connect to Postgres Database: %v. ", err)
+		panic(err.Error())
+	}
+	defer database.GetDB().Close()
 
 	clientConfig, err := getRestConfig(Config.Kubeconfig)
 	if err != nil {

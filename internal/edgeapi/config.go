@@ -35,4 +35,12 @@ type Config struct {
 
 	// RemoteBackendTimeout specifies timeout. Has to be parsable to time.Duration
 	RemoteBackendTimeout time.Duration `envconfig:"REMOTE_BACKEND_TIMEOUT" default:"5s"`
+
+	// Variables for the database storing IoT components
+	DBHost     string `envconfig:"DB_HOST" default:"localhost"`
+	DBPort     string `envconfig:"DB_PORT" default:"5432"`
+	DBUser     string `envconfig:"DB_USER" default:"flotta"`
+	DBPassword string `envconfig:"DB_PASSWORD" default:"flotta"`
+	DBName     string `envconfig:"DB_NAME" default:"postgres"`
+	SSLMode    string `envconfig:"DB_SSL_MODE" default:"disable"`
 }

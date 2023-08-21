@@ -23,6 +23,9 @@ type DeviceConfiguration struct {
 	// ansible manager
 	AnsibleManager *AnsibleManagerConfiguration `json:"ansible-manager,omitempty"`
 
+	// db wireless devices
+	DbWirelessDevices []*DbWirelessDevice `json:"db_wireless_devices"`
+
 	// heartbeat
 	Heartbeat *HeartbeatConfiguration `json:"heartbeat,omitempty"`
 
@@ -50,6 +53,10 @@ func (m *DeviceConfiguration) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAnsibleManager(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDbWirelessDevices(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -101,6 +108,32 @@ func (m *DeviceConfiguration) validateAnsibleManager(formats strfmt.Registry) er
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *DeviceConfiguration) validateDbWirelessDevices(formats strfmt.Registry) error {
+	if swag.IsZero(m.DbWirelessDevices) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.DbWirelessDevices); i++ {
+		if swag.IsZero(m.DbWirelessDevices[i]) { // not required
+			continue
+		}
+
+		if m.DbWirelessDevices[i] != nil {
+			if err := m.DbWirelessDevices[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("db_wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("db_wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -268,6 +301,10 @@ func (m *DeviceConfiguration) ContextValidate(ctx context.Context, formats strfm
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateDbWirelessDevices(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateHeartbeat(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -313,6 +350,26 @@ func (m *DeviceConfiguration) contextValidateAnsibleManager(ctx context.Context,
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *DeviceConfiguration) contextValidateDbWirelessDevices(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.DbWirelessDevices); i++ {
+
+		if m.DbWirelessDevices[i] != nil {
+			if err := m.DbWirelessDevices[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("db_wireless_devices" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("db_wireless_devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

@@ -1,0 +1,117 @@
+apiVersion: management.project-flotta.io/v1alpha1
+kind: EdgeDevice
+metadata:
+  creationTimestamp: "2023-08-18T18:10:10Z"
+  finalizers:
+  - device-finalizer
+  generation: 13
+  labels:
+    device.cpu-architecture: x86_64
+    device.cpu-model: intelrcoretmi5-5250ucpu1.60ghz
+    device.hostname: fedora
+  name: 53974c0582c543c28f81ba29cf6eb07b
+  namespace: default
+spec:
+  requestTime: "2023-08-18T18:10:10Z"
+  wirelessDevices:
+  - wireless_device_connection: BLE
+    wireless_device_identifier: 64:B7:08:62:4D:2E
+    wireless_device_manufacturer: DCN
+    wireless_device_model: ESP32
+    wireless_device_name: DHT
+    wireless_device_protocol: BLE
+    device_properties:
+    - property_access_mode: Read
+      property_identifier: 2xj24
+      property_name: Humidity
+      property_reading: 46.00%
+      wireless_device_identifier: 64:B7:08:62:4D:2E
+    - property_access_mode: Read
+      property_identifier: 55j64
+      property_name: Temperature
+      property_reading: 26.20°C
+      wireless_device_identifier: 64:B7:08:62:4D:2E
+
+  - wireless_device_availability: wi-fi
+    wireless_device_connection: wi-fi
+    wireless_device_identifier: esp8266-q2svd53zb9p4
+    wireless_device_manufacturer: DCN
+    wireless_device_model: ESP32
+    wireless_device_name: NodeMCU
+    wireless_device_protocol: mqtt
+    device_properties:
+      - property_access_mode: ReadWrite
+        property_identifier: q2s2e35xx32
+        property_name: LED Switch
+        property_state: "OFF"
+        wireless_device_identifier: esp8266-q2svd53zb9p4
+status:
+  hardware:
+    disks: []
+    gpus: []
+    interfaces: []
+  lastSyncedResourceVersion: "2642028"
+  phase: up
+  upgradeInformation:
+    currentCommitID: unknown
+  wirelessDevices:
+  - device_properties:
+    - property_access_mode: Read
+      property_identifier: 2xj24
+      property_last_seen: "2023-08-19 17:44:25"
+      property_name: Humidity
+      property_reading: 47.00%
+      wireless_device_identifier: esp8266-0XP3XQ07
+    - property_access_mode: Read
+      property_identifier: 55j64
+      property_last_seen: "2023-08-19 17:44:25"
+      property_name: Temperature
+      property_reading: 26.70°C
+      wireless_device_identifier: esp8266-0XP3XQ07
+    wireless_device_availability: wi-fi
+    wireless_device_connection: wi-fi
+    wireless_device_identifier: esp8266-0XP3XQ07
+    wireless_device_last_seen: "2023-08-19 17:44:25"
+    wireless_device_manufacturer: DCN
+    wireless_device_model: ESP32
+    wireless_device_name: DHT
+    wireless_device_protocol: mqtt
+  - device_properties:
+    - property_access_mode: ReadWrite
+      property_identifier: q2s2e35xx32
+      property_last_seen: "2023-08-19 17:44:25"
+      property_name: LED Switch
+      property_state: "OFF"
+      wireless_device_identifier: esp8266-q2svd53zb9p4
+    wireless_device_availability: wi-fi
+    wireless_device_connection: wi-fi
+    wireless_device_identifier: esp8266-q2svd53zb9p4
+    wireless_device_last_seen: "2023-08-19 17:44:25"
+    wireless_device_manufacturer: DCN
+    wireless_device_model: ESP32
+    wireless_device_name: NodeMCU
+    wireless_device_protocol: mqtt
+
+  - wireless_device_name: NodeMCU
+    wireless_device_connection: wi-fi
+    wireless_device_identifier: esp8266-q2svd53zb9p4
+    wireless_device_manufacturer: DCN
+    wireless_device_model: ESP32
+    wireless_device_protocol: mqtt
+    wireless_device_last_seen: "2023-08-19 17:44:25"
+    device_properties:
+      - property_access_mode: ReadWrite
+        property_identifier: q2s2e35xx32
+        property_name: LED Switch
+        property_state: "OFF"
+        wireless_device_identifier: esp8266-q2svd53zb9p4
+        property_last_seen: "2023-08-19 17:44:25"
+  workloads:
+  - name: workloads-53974c0582c543c28f81ba29cf6eb07b-1692386307617796326
+    phase: Deploying
+  - name: plugin-53974c0582c543c28f81ba29cf6eb07b-1692386307617774621
+    phase: Deploying
+  - name: workloads-53974c0582c543c28f81ba29cf6eb07b-1692383363510797732
+    phase: Deploying
+  - name: plugin-53974c0582c543c28f81ba29cf6eb07b-1692383363510785785
+    phase: Deploying

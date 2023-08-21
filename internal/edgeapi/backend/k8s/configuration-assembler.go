@@ -17,6 +17,7 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/storage"
 	"github.com/project-flotta/flotta-operator/internal/common/utils"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/configmaps"
+	"github.com/project-flotta/flotta-operator/internal/edgeapi/database"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/devicemetrics"
 	"github.com/project-flotta/flotta-operator/internal/edgeapi/images"
 	"github.com/project-flotta/flotta-operator/models"
@@ -110,6 +111,7 @@ func (a *ConfigurationAssembler) GetDeviceConfiguration(ctx context.Context, edg
 	dc.Configuration.Os = getOsConfiguration(edgeDevice, deviceSet)
 	dc.Configuration.Mounts = a.getMountConfiguration(ctx, edgeDevice, deviceSet)
 	dc.Configuration.WirelessDevices = a.getWirelessDevicesConfiguration(ctx, edgeDevice, logger)
+	dc.Configuration.DbWirelessDevices = a.getDatabaseKnownWirelessDevicesConfiguration(ctx, logger)
 
 	var err error
 	dc.Configuration.Storage, err = a.getStorageConfiguration(ctx, edgeDevice, deviceSet)
@@ -337,22 +339,36 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 		wireless_devices = append(wireless_devices, wireless_device)
 	}
 
-	// for _, item := range wireless_devices {
-	// 	fmt.Printf("Name: %s\n", item.Name)
-	// 	fmt.Printf("Manufacturer: %s\n", item.Manufacturer)
-	// 	fmt.Printf("Model: %s\n", item.Model)
-	// 	fmt.Printf("Software Version: %s\n", item.SwVersion)
-	// 	fmt.Printf("Identifiers: %s\n", item.Identifiers)
-	// 	fmt.Printf("Protocol: %s\n", item.Protocol)
-	// 	fmt.Printf("Connection: %s\n", item.Connection)
-	// 	fmt.Printf("Battery: %s\n", item.Battery)
-	// 	fmt.Printf("Availability: %s\n", item.Availability)
-	// 	fmt.Printf("Device Type: %s\n", item.DeviceType)
-	// 	fmt.Printf("Last Seen: %s\n", item.LastSeen)
-	// 	fmt.Println("--------")
-	// }
-
 	return wireless_devices
+}
+
+func (a *ConfigurationAssembler) getDatabaseKnownWirelessDevicesConfiguration(ctx context.Context, logger *zap.SugaredLogger) []*models.DbWirelessDevice {
+	db := database.GetDB()
+	// Perform a SELECT query
+	rows, err := db.Query("SELECT wireless_device_identifier, wireless_device_name FROM known_device")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	var dbWirelessDevices []*models.DbWirelessDevice
+	// Iterate through the query results
+	for rows.Next() {
+
+		var wirelessDeviceName string
+		var wirelessDeviceIdentifier string
+		err := rows.Scan(&wirelessDeviceIdentifier, &wirelessDeviceName)
+		if err != nil {
+			panic(err)
+		}
+		dbWirelessDevice := models.DbWirelessDevice{
+			WirelessDeviceIdentifier: wirelessDeviceIdentifier,
+			WirelessDeviceName:       wirelessDeviceName,
+		}
+		dbWirelessDevices = append(dbWirelessDevices, &dbWirelessDevice)
+	}
+
+	return dbWirelessDevices
 }
 
 func (a *ConfigurationAssembler) toWorkloadList(ctx context.Context, logger *zap.SugaredLogger, edgeworkloads []v1alpha1.EdgeWorkload, device *v1alpha1.EdgeDevice) (models.WorkloadList, error) {
