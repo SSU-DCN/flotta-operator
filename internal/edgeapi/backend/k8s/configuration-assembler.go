@@ -345,7 +345,7 @@ func (a *ConfigurationAssembler) getWirelessDevicesConfiguration(ctx context.Con
 func (a *ConfigurationAssembler) getDatabaseKnownWirelessDevicesConfiguration(ctx context.Context, logger *zap.SugaredLogger) []*models.DbWirelessDevice {
 	db := database.GetDB()
 	// Perform a SELECT query
-	rows, err := db.Query("SELECT wireless_device_identifier, wireless_device_name FROM known_device")
+	rows, err := db.Query("SELECT wireless_device_identifier, wireless_device_name FROM system_known_device")
 	if err != nil {
 		panic(err)
 	}
