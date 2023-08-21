@@ -293,7 +293,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 					PropertyDescription:      propertyData.PropertyDescription,
 					PropertyIdentifier:       propertyData.PropertyIdentifier,
 					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
-					PropertyLastSeen:         propertyData.PropertyLastSeen,
+					// PropertyLastSeen:         propertyData.PropertyLastSeen,
 
 					PropertyReading:     propertyData.PropertyReading,
 					PropertyServiceUUID: propertyData.PropertyServiceUUID,
