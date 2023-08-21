@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq"
+
 	"github.com/project-flotta/flotta-operator/internal/edgeapi"
 )
 
