@@ -26,6 +26,9 @@ type Repository interface {
 	ListForEdgeConfig(ctx context.Context, name string, namespace string) ([]v1alpha1.EdgeDevice, error)
 	RemoveFinalizer(ctx context.Context, edgeDevice *v1alpha1.EdgeDevice, finalizer string) error
 	UpdateLabels(ctx context.Context, device *v1alpha1.EdgeDevice, labels map[string]string) error
+
+	//added
+	CreateEdgeWorkload(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error
 }
 
 type CRRepository struct {
@@ -172,4 +175,8 @@ func (r *CRRepository) updateLabels(ctx context.Context, device *v1alpha1.EdgeDe
 		device.Labels = deviceCopy.Labels
 	}
 	return err
+}
+
+func (r *CRRepository) CreateEdgeWorkload(ctx context.Context, edgeWorkload *v1alpha1.EdgeWorkload) error {
+	return r.client.Create(ctx, edgeWorkload)
 }

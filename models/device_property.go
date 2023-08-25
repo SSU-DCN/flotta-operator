@@ -20,6 +20,9 @@ type DeviceProperty struct {
 	// access mode of the property, Read or ReadWrite
 	PropertyAccessMode string `json:"property_access_mode,omitempty"`
 
+	// whether device property is allowed to send data or not
+	PropertyActiveStatus string `json:"property_active_status,omitempty"`
+
 	// Description of the property
 	PropertyDescription string `json:"property_description,omitempty"`
 

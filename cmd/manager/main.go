@@ -32,6 +32,7 @@ import (
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevice"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgedevicesignedrequest"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/edgeworkload"
+	"github.com/project-flotta/flotta-operator/internal/common/repository/endnodeautoconfig"
 	"github.com/project-flotta/flotta-operator/internal/common/repository/playbookexecution"
 	"github.com/project-flotta/flotta-operator/internal/common/storage"
 	"github.com/project-flotta/flotta-operator/internal/operator/informers"
@@ -177,6 +178,7 @@ func main() {
 	edgeDeviceSignedRequestRepository := edgedevicesignedrequest.NewEdgedeviceSignedRequestRepository(mgr.GetClient())
 	edgeDeviceRepository := edgedevice.NewEdgeDeviceRepository(mgr.GetClient())
 	edgeWorkloadRepository := edgeworkload.NewEdgeWorkloadRepository(mgr.GetClient())
+	endNodeAutoConfigRepository := endnodeautoconfig.NewEndNodeAutoConfigRepository(mgr.GetClient())
 	claimer := storage.NewClaimer(mgr.GetClient())
 	metricsObj := metrics.New()
 
@@ -242,6 +244,21 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "EdgeConfig")
 		os.Exit(1)
 	}
+
+	if err = (&controllers.EndNodeAutoConfigReconciler{
+		Client:                      mgr.GetClient(),
+		Scheme:                      mgr.GetScheme(),
+		EdgeWorkloadRepository:      edgeWorkloadRepository,
+		EdgeDeviceRepository:        edgeDeviceRepository,
+		EndNodeAutoConfigRepository: endNodeAutoConfigRepository,
+		Concurrency:                 Config.EdgeConfigConcurrency,
+		ExecuteConcurrent:           controllers.ExecuteConcurrent,
+		MaxConcurrentReconciles:     int(Config.MaxConcurrentReconciles),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "EndNodeAutoConfig")
+		os.Exit(1)
+	}
+
 	// webhooks
 	if Config.EnableWebhooks {
 		if err = (&managementv1alpha1.EdgeWorkload{}).SetupWebhookWithManager(mgr); err != nil {

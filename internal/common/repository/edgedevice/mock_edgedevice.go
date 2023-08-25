@@ -52,6 +52,20 @@ func (mr *MockRepositoryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), arg0, arg1)
 }
 
+// CreateEdgeWorkload mocks base method.
+func (m *MockRepository) CreateEdgeWorkload(arg0 context.Context, arg1 *v1alpha1.EdgeWorkload) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEdgeWorkload", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateEdgeWorkload indicates an expected call of CreateEdgeWorkload.
+func (mr *MockRepositoryMockRecorder) CreateEdgeWorkload(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEdgeWorkload", reflect.TypeOf((*MockRepository)(nil).CreateEdgeWorkload), arg0, arg1)
+}
+
 // ListForEdgeConfig mocks base method.
 func (m *MockRepository) ListForEdgeConfig(arg0 context.Context, arg1, arg2 string) ([]v1alpha1.EdgeDevice, error) {
 	m.ctrl.T.Helper()

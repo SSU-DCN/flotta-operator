@@ -264,7 +264,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 				WirelessDeviceConnection:   HBwirelessDevice.WirelessDeviceConnection,
 				WirelessDeviceAvailability: HBwirelessDevice.WirelessDeviceAvailability,
 				WirelessDeviceBattery:      HBwirelessDevice.WirelessDeviceBattery,
-				WirelessDeviceDescription:  HBwirelessDevice.WirelessDeviceDescription,
+				// WirelessDeviceDescription:  HBwirelessDevice.WirelessDeviceDescription,
 				// WirelessDeviceLastSeen:     HBwirelessDevice.WirelessDeviceLastSeen,
 			}
 
@@ -288,17 +288,17 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			var deviceProperties []*v1alpha1.DeviceProperty
 			for _, propertyData := range HBwirelessDevice.DeviceProperties {
 				property := &v1alpha1.DeviceProperty{
-					PropertyName:             propertyData.PropertyName,
-					PropertyAccessMode:       propertyData.PropertyAccessMode,
-					PropertyDescription:      propertyData.PropertyDescription,
+					PropertyName:       propertyData.PropertyName,
+					PropertyAccessMode: propertyData.PropertyAccessMode,
+					// PropertyDescription:      propertyData.PropertyDescription,
 					PropertyIdentifier:       propertyData.PropertyIdentifier,
 					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
 					// PropertyLastSeen:         propertyData.PropertyLastSeen,
 
 					PropertyReading:     propertyData.PropertyReading,
 					PropertyServiceUUID: propertyData.PropertyServiceUUID,
-					PropertyState:       propertyData.PropertyState,
-					PropertyUnit:        propertyData.PropertyUnit,
+					// PropertyState:       propertyData.PropertyState,
+					PropertyUnit: propertyData.PropertyUnit,
 				}
 
 				deviceProperties = append(deviceProperties, property)
@@ -352,10 +352,11 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 					WirelessDeviceIdentifier: propertyData.WirelessDeviceIdentifier,
 					PropertyLastSeen:         propertyData.PropertyLastSeen,
 
-					PropertyReading:     propertyData.PropertyReading,
-					PropertyServiceUUID: propertyData.PropertyServiceUUID,
-					PropertyState:       propertyData.PropertyState,
-					PropertyUnit:        propertyData.PropertyUnit,
+					PropertyReading:      propertyData.PropertyReading,
+					PropertyServiceUUID:  propertyData.PropertyServiceUUID,
+					PropertyState:        propertyData.PropertyState,
+					PropertyUnit:         propertyData.PropertyUnit,
+					PropertyActiveStatus: propertyData.PropertyActiveStatus,
 				}
 
 				deviceProperties = append(deviceProperties, property)
@@ -365,7 +366,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 			edgeDevice.Status.WirelessDevices = append(edgeDevice.Status.WirelessDevices, convertedDevice)
 		} else {
 
-			b.logger.Info("Update the status")
+			// b.logger.Info("Update the status")
 			// The wireless device already exists in the status, update it
 
 			for _, device := range edgeDevice.Status.WirelessDevices {
@@ -390,6 +391,7 @@ func (b *backend) HandleWirelessDevices(ctx context.Context, name string, namesp
 							devicePropertyData.PropertyServiceUUID = hbProperty.PropertyServiceUUID
 							devicePropertyData.PropertyState = hbProperty.PropertyState
 							devicePropertyData.PropertyUnit = hbProperty.PropertyUnit
+							devicePropertyData.PropertyActiveStatus = hbProperty.PropertyActiveStatus
 						}
 					}
 
@@ -448,7 +450,7 @@ func (b *backend) matchingPropertyIdentifier(propertyIdentifierToCheck string, H
 
 func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, namespace string, device_name string, wirelessDevice *models.WirelessDevice) (bool, error) {
 
-	b.logger.Infof("WE ARE IN THE FUNCTION")
+	b.logger.Infof("WE ARE IN THE applyWorkloadsFromEndNodeAutoConfig FUNCTION ")
 
 	// logger := b.logger.With("DeviceID", device.Name)
 
@@ -466,11 +468,11 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, names
 	var endNodeAutoConfig *v1alpha1.EndNodeAutoConfig
 	// fetch all configs in the namespace
 	for _, item := range listEndNodeAutoConfig {
-		fmt.Println("HEY Workloads APPLY")
-		b.logger.Info(item.Spec.Configuration.Connection, "item.Spec.Configuration.Connection")
-		b.logger.Info(item.Spec.Configuration.Protocol, "item.Spec.Configuration.Protocol")
-		b.logger.Info(wirelessDevice.WirelessDeviceConnection, "wirelessDevice.Connection")
-		b.logger.Info(wirelessDevice.WirelessDeviceProtocol, "wirelessDevice.Protocol")
+		// fmt.Println("HEY Workloads APPLY")
+		// b.logger.Info(item.Spec.Configuration.Connection, "item.Spec.Configuration.Connection")
+		// b.logger.Info(item.Spec.Configuration.Protocol, "item.Spec.Configuration.Protocol")
+		// b.logger.Info(wirelessDevice.WirelessDeviceConnection, "wirelessDevice.Connection")
+		// b.logger.Info(wirelessDevice.WirelessDeviceProtocol, "wirelessDevice.Protocol")
 		if strings.ToLower(item.Spec.Configuration.Protocol) == strings.ToLower(wirelessDevice.WirelessDeviceConnection) || strings.ToLower(item.Spec.Configuration.Protocol) == strings.ToLower(wirelessDevice.WirelessDeviceProtocol) {
 			// Found the matching EndNodeAutoConfig resource, return it.
 			b.logger.Info("MatchedHERE")
@@ -485,14 +487,14 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, names
 	}
 	b.logger.Infof("WE ARE IN THE FUNCTION 3")
 
-	deviceConfigPlugins := []v1.Container{}
-	for _, item := range endNodeAutoConfig.Spec.Configuration.DevicePlugin.Containers {
-		container := v1.Container{
-			Name:  item.Name,
-			Image: item.Image,
-		}
-		deviceConfigPlugins = append(deviceConfigPlugins, container)
-	}
+	// deviceConfigPlugins := []v1.Container{}
+	// for _, item := range endNodeAutoConfig.Spec.Configuration.DevicePlugin.Containers {
+	// 	container := v1.Container{
+	// 		Name:  item.Name,
+	// 		Image: item.Image,
+	// 	}
+	// 	deviceConfigPlugins = append(deviceConfigPlugins, container)
+	// }
 
 	edgeConfigsWorkloads := []v1.Container{}
 	for _, item := range endNodeAutoConfig.Spec.Configuration.WorkloadSpec.Containers {
@@ -503,27 +505,27 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, names
 		edgeConfigsWorkloads = append(edgeConfigsWorkloads, container)
 	}
 
-	edgeWorkloadDevicePlugin := &v1alpha1.EdgeWorkload{
-		TypeMeta: metav1.TypeMeta{},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      generateUniqueName("plugin", device_name),
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.EdgeWorkloadSpec{
-			Device: device_name,
-			Type:   v1alpha1.PodWorkloadType,
-			Pod: v1alpha1.Pod{
-				Spec: v1.PodSpec{
-					Containers: append([]v1.Container{}, deviceConfigPlugins...),
-				},
-			},
-		},
-	}
+	// edgeWorkloadDevicePlugin := &v1alpha1.EdgeWorkload{
+	// 	TypeMeta: metav1.TypeMeta{},
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name:      generateUniqueName("plugin", device_name),
+	// 		Namespace: namespace,
+	// 	},
+	// 	Spec: v1alpha1.EdgeWorkloadSpec{
+	// 		Device: device_name,
+	// 		Type:   v1alpha1.PodWorkloadType,
+	// 		Pod: v1alpha1.Pod{
+	// 			Spec: v1.PodSpec{
+	// 				Containers: append([]v1.Container{}, deviceConfigPlugins...),
+	// 			},
+	// 		},
+	// 	},
+	// }
 
 	edgeWorkloadDeviceWorkloads := &v1alpha1.EdgeWorkload{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      generateUniqueName("workloads", device_name),
+			Name:      generateUniqueName("wkl", device_name),
 			Namespace: namespace,
 		},
 		Spec: v1alpha1.EdgeWorkloadSpec{
@@ -537,19 +539,25 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, names
 		},
 	}
 
-	pluginCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDevicePlugin)
+	// pluginCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDevicePlugin)
 	workloadCreateError := b.repository.CreateEdgeWorkload(ctx, edgeWorkloadDeviceWorkloads)
-	if pluginCreateError != nil || workloadCreateError != nil {
-		if pluginCreateError != nil {
-			// logger.Errorf("Failed to create endNode Plugin ", pluginCreateError)
-			return false, pluginCreateError
-		}
-
+	if workloadCreateError != nil {
 		if workloadCreateError != nil {
 			// logger.Errorf("Failed to create endNode Workloads ", workloadCreateError)
 			return false, workloadCreateError
 		}
 	}
+	// if pluginCreateError != nil || workloadCreateError != nil {
+	// 	if pluginCreateError != nil {
+	// 		// logger.Errorf("Failed to create endNode Plugin ", pluginCreateError)
+	// 		return false, pluginCreateError
+	// 	}
+
+	// 	if workloadCreateError != nil {
+	// 		// logger.Errorf("Failed to create endNode Workloads ", workloadCreateError)
+	// 		return false, workloadCreateError
+	// 	}
+	// }
 
 	return true, nil
 }
@@ -557,5 +565,5 @@ func (b *backend) applyWorkloadsFromEndNodeAutoConfig(ctx context.Context, names
 // generateUniqueName generates a unique name using a unique identifier.
 func generateUniqueName(name, device string) string {
 
-	return fmt.Sprintf("%s-%s-%d", name, device, time.Now().UnixNano())
+	return fmt.Sprintf("%s-%d", name, time.Now().UnixNano())
 }

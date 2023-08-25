@@ -914,6 +914,9 @@ definitions:
       property_last_seen:
         description: Last activity of the property
         type: string
+      property_active_status:
+        description: whether device property is allowed to send data or not
+        type: string
   db_wireless_device:
     type: object
     properties:

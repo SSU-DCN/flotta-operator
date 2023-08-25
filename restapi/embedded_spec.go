@@ -425,6 +425,10 @@ func init() {
           "description": "access mode of the property, Read or ReadWrite",
           "type": "string"
         },
+        "property_active_status": {
+          "description": "whether device property is allowed to send data or not",
+          "type": "string"
+        },
         "property_description": {
           "description": "Description of the property",
           "type": "string"
@@ -1760,6 +1764,10 @@ func init() {
       "properties": {
         "property_access_mode": {
           "description": "access mode of the property, Read or ReadWrite",
+          "type": "string"
+        },
+        "property_active_status": {
+          "description": "whether device property is allowed to send data or not",
           "type": "string"
         },
         "property_description": {

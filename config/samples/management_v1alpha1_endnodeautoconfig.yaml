@@ -11,10 +11,13 @@ spec:
     devicePlugin:
       containers:
         - name: device-plugin
-          image: quay.io/bitnami/nginx:1.20
+          image: quay.io/iot.plugin-wifi.io:1.1
     workloadSpec:
       containers:
         - name: workload-iot
           image: quay.io/bitnami/nginx:1.20
+
+
+          
 
 # also apply edge workloads based on specific edge devices
