@@ -1,7 +1,7 @@
-AutomatedIoTFramework
+AutomatedIoTFrameworkOperator
 Copyright 2023 DCN LAB.
 
-The AutomatedIoTFramework project contains subcomponents with separate copyright notices and license terms. 
+The AutomatedIoTFrameworkOperator project contains subcomponents with separate copyright notices and license terms. 
 Your use of the source code for these subcomponents is subject to the terms and conditions of the following licenses.
 
 =======================================================================
