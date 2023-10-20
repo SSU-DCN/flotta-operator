@@ -1,0 +1,41 @@
+AutomatedIoTFramework
+Copyright 2023 DCN LAB.
+
+The AutomatedIoTFramework project contains subcomponents with separate copyright notices and license terms. 
+Your use of the source code for these subcomponents is subject to the terms and conditions of the following licenses.
+
+=======================================================================
+Project-Flotta (https://github.com/project-flotta)
+=======================================================================
+/*
+Copyright the Project-Flotta Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+The file paths below are files that modified existing code or were newly added to add the automated IoT functionality.
+- /swagger.yaml
+- /swagger-backend.yaml
+- /api/v1alpha1/endnodeautoconfig_types.go
+- /api/v1alpha1/endnodeconfig_types.go
+- /api/v1alpha1/edgedevice_types.go
+- /api/v1alpha1/edgedevice_types.go
+- /cmd/httpapi/main.go
+- 
+- /velero/blob/main/pkg/backup/checkpoint.go
+- /velero/blob/main/pkg/cmd/cli/backup/create.go
+- /velero/blob/main/pkg/controller/backup_controller.go
+
+The file paths below are files that have modified existing code or been newly added to manage data stored in storge.
+- /velero/blob/main/pkg/controller/backup_controller.go
+- /velero/blob/main/pkg/apis/velero/v1/backup_types.go
