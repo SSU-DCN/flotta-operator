@@ -29,13 +29,19 @@ The file paths below are files that modified existing code or were newly added t
 - /api/v1alpha1/endnodeautoconfig_types.go
 - /api/v1alpha1/endnodeconfig_types.go
 - /api/v1alpha1/edgedevice_types.go
-- /api/v1alpha1/edgedevice_types.go
 - /cmd/httpapi/main.go
-- 
-- /velero/blob/main/pkg/backup/checkpoint.go
-- /velero/blob/main/pkg/cmd/cli/backup/create.go
-- /velero/blob/main/pkg/controller/backup_controller.go
+- /cmd/manager/main.go
+- /controllers/endnodeautoconfig_controller.go
+- /controllers/endnodeconfig_controller.go
+- /internal/common/repository/edgedevice/edgedevice.go
+- /internal/common/repository/edgeworkload/edgeworkload.go
+- /internal/common/repository/endnodeautoconfig/endnodeautoconfig.go
+- /internal/edgeapi/backend/factory/factory.go
+- /internal/edgeapi/backend/k8s/backend.go
+- /internal/edgeapi/backend/k8s/configuration-assembler.go
+- /internal/edgeapi/backend/k8s/repository.go
+- /internal/edgeapi/backend/remote/backend.go
+- /internal/edgeapi/backend/api.go
+- /internal/edgeapi/yggdrasil/yggdrasil.go
+- /internal/edgeapi/config.go
 
-The file paths below are files that have modified existing code or been newly added to manage data stored in storge.
-- /velero/blob/main/pkg/controller/backup_controller.go
-- /velero/blob/main/pkg/apis/velero/v1/backup_types.go
